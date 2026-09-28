@@ -255,8 +255,10 @@ import people from '../assets/hero/lide.png';
 
   .hero__title {
     margin: 0 0 36px;
-    /* Na telefonu vyplní „více svobody“ (≈ 6,2 em) šířku obsahu, na počítači podle šířky okna. */
-    font-size: clamp(40px, calc((100vw - 2 * var(--gutter)) / 6.3), 88px);
+    /* Vždy dva řádky: každý je nezalomitelný a na telefonu „více svobody“ (≈ 6,2 em) zabere
+       skoro celou šířku obsahu – s rezervou na odlišné vykreslení písma v telefonech. */
+    font-size: clamp(32px, calc((100vw - 2 * var(--gutter)) / 6.6), 88px);
+    white-space: nowrap;
     font-weight: 800;
     line-height: 0.98;
     letter-spacing: -0.035em;
