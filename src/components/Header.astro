@@ -1,0 +1,306 @@
+---
+// Horní lišta podle IS (.p-header: černá, 80 px) se strukturou z návrhu ve Frameru:
+// hlavní položky, rozbalovací menu „Více“ na celou šířku a tlačítko Přispět.
+// Mobil: hamburger bez JS (zaškrtávátko), skupiny z „Více“ jsou v něm rovnou rozbalené.
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { links, nav, navMore } from '../config';
+
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => href.startsWith('/') && !href.includes('#') && href !== '/' && path.startsWith(href);
+---
+
+<header class="p-header">
+  <div class="container p-header__inner">
+    <a href="/" aria-label="Voluntia – úvodní stránka"><Logo height={50} /></a>
+
+    <input type="checkbox" id="nav-toggle" class="nav-toggle" />
+    <label for="nav-toggle" class="nav-toggle-label">
+      <span class="sr-only">Menu</span>
+      <Icon name="Menu" size={28} class="ico-menu" />
+      <Icon name="X" size={28} class="ico-x" />
+    </label>
+
+    <nav class="p-nav" aria-label="Hlavní navigace">
+      <ul class="p-nav__main">
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        <li class="p-nav__more-item">
+          <button class="p-nav__more" type="button" aria-expanded="false" aria-controls="nav-more">
+            Více <Icon name="ChevronDown" size={18} class="p-nav__chevron" />
+          </button>
+        </li>
+        <li class="p-nav__cta"><a class="btn btn--light" href={links.donate}>Přispět</a></li>
+      </ul>
+
+      <div class="mega" id="nav-more">
+        <div class="container mega__cols">
+          {
+            navMore.map((group) => (
+              <div class="mega__group">
+                <h2>{group.title}</h2>
+                <ul>
+                  {group.items.map((item) => (
+                    <li>
+                      <a href={item.href}>{item.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('.p-header');
+  const more = document.querySelector<HTMLButtonElement>('.p-nav__more');
+  const toggle = document.getElementById('nav-toggle') as HTMLInputElement | null;
+
+  const setMore = (open: boolean) => {
+    more?.setAttribute('aria-expanded', String(open));
+    header?.classList.toggle('is-more-open', open);
+  };
+
+  more?.addEventListener('click', () => setMore(more.getAttribute('aria-expanded') !== 'true'));
+
+  // Zavření klávesou Esc (jako public.js v IS) a kliknutím mimo lištu.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (more?.getAttribute('aria-expanded') === 'true') {
+      setMore(false);
+      more.focus();
+    }
+    if (toggle?.checked) toggle.checked = false;
+  });
+  document.addEventListener('click', (e) => {
+    if (header && !header.contains(e.target as Node)) setMore(false);
+  });
+</script>
+
+<style>
+  .p-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--black);
+  }
+  .p-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: var(--header-h);
+  }
+
+  /* ── Mobil ─────────────────────────────────────────────── */
+  .nav-toggle {
+    display: none;
+  }
+  .nav-toggle-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-right: -10px;
+    color: var(--white);
+    cursor: pointer;
+  }
+  .nav-toggle-label :global(.ico-x),
+  .nav-toggle:checked ~ .nav-toggle-label :global(.ico-menu) {
+    display: none;
+  }
+  .nav-toggle:checked ~ .nav-toggle-label :global(.ico-x) {
+    display: inline-block;
+  }
+  .p-nav {
+    display: none;
+  }
+  .nav-toggle:checked ~ .p-nav {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    max-height: calc(100vh - var(--header-h));
+    overflow-y: auto;
+    background: var(--black);
+    border-top: 1px solid var(--border);
+    padding: 12px 0 0;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .p-nav__main {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 var(--gutter);
+  }
+  .p-nav a:not(.btn) {
+    color: var(--white);
+    font-size: var(--fs-nav);
+    font-weight: 500;
+    transition: color var(--dur) var(--ease);
+  }
+  .p-nav__main a:not(.btn) {
+    display: block;
+    padding: 10px 0;
+  }
+  .p-nav a:not(.btn):hover,
+  .p-nav a:not(.btn)[aria-current] {
+    color: var(--yellow);
+    text-decoration: none;
+  }
+  .p-nav__more-item {
+    display: none;
+  }
+  .p-nav__cta {
+    order: 10;
+    margin-top: 14px;
+  }
+  .p-nav__cta .btn {
+    width: 100%;
+  }
+
+  /* Skupiny z „Více“ – na mobilu rovnou vidět pod hlavními položkami. */
+  .mega {
+    margin-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .mega__cols {
+    display: grid;
+    gap: 24px;
+    padding-top: 20px;
+    padding-bottom: 24px;
+  }
+  .mega__group h2 {
+    margin: 0 0 8px;
+    font-size: var(--fs-body);
+    font-weight: 700;
+  }
+  .mega__group ul {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .mega__group a:not(.btn) {
+    display: block;
+    padding: 5px 0;
+    font-size: var(--fs-small);
+    color: var(--text-soft);
+  }
+
+  /* ── Desktop ───────────────────────────────────────────── */
+  @media (min-width: 62em) {
+    .nav-toggle-label {
+      display: none;
+    }
+    .p-nav,
+    .nav-toggle:checked ~ .p-nav {
+      display: block;
+      position: static;
+      max-height: none;
+      overflow: visible;
+      border: 0;
+      padding: 0;
+      background: none;
+    }
+    .p-nav__main {
+      flex-direction: row;
+      align-items: center;
+      gap: 22px;
+      padding: 0;
+    }
+    .p-nav__main a:not(.btn) {
+      padding: 0;
+    }
+    .p-nav__more-item {
+      display: block;
+    }
+    .p-nav__more {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--white);
+      font: inherit;
+      font-size: var(--fs-nav);
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .p-nav__more:hover,
+    .p-nav__more[aria-expanded='true'] {
+      color: var(--yellow);
+    }
+    .p-nav__more {
+      transition: color var(--dur) var(--ease);
+    }
+    .p-nav__more :global(.p-nav__chevron) {
+      transition: transform var(--dur) var(--ease);
+    }
+    .p-nav__more[aria-expanded='true'] :global(.p-nav__chevron) {
+      transform: rotate(180deg);
+    }
+    .p-nav__cta {
+      order: 0;
+      margin-top: 0;
+    }
+    .p-nav__cta .btn {
+      width: auto;
+    }
+
+    /* Menu „Více“ přes celou šířku pod lištou – plynule se prolne, neskočí.
+       `visibility` ho po zavření skryje i pro klávesnici a čtečky. */
+    .mega {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      margin: 0;
+      background: var(--black);
+      border-top: 1px solid var(--border);
+      box-shadow: 0 24px 40px rgb(0 0 0 / 0.45);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px);
+      transition:
+        opacity var(--dur) var(--ease),
+        transform var(--dur) var(--ease),
+        visibility 0s linear var(--dur);
+    }
+    .p-header.is-more-open .mega {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition-delay: 0s;
+    }
+    .mega__cols {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 48px;
+      padding-top: 32px;
+      padding-bottom: 32px;
+    }
+  }
+  /* Na širších obrazovkách víc vzduchu mezi položkami (na užších se jich 6 musí vejít). */
+  @media (min-width: 75em) {
+    .p-nav__main {
+      gap: 34px;
+    }
+  }
+</style>

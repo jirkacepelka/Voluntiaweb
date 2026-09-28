@@ -1,0 +1,858 @@
+/* ==========================================================================
+   Voluntia web
+   --------------------------------------------------------------------------
+   Vzhled je převzatý 1:1 z veřejné části IS (is.voluntia.cz, css/public.css)
+   a ze statnidluh.voluntia.cz. Tokeny, velikosti i komponenty (tlačítka,
+   záložky, karty, lidé, patička) drží stejné hodnoty, aby weby působily jako
+   jeden celek. Při změně v IS je potřeba upravit i tady.
+   ========================================================================== */
+
+/* ── Tokeny (z IS) ─────────────────────────────────────────────────────── */
+:root {
+  --yellow: #fed801;
+  --white: #ffffff;
+  --black: #000000;
+  --bg: #121212;
+  --surface: #121212;
+  --field: #2a2a2a;
+  --field-hover: #333333;
+  --border: #2c2c2c;
+  --muted: #a0a0a0;
+  --dim: #717171;
+  --danger: #ff4466;
+
+  /* ze statnidluh */
+  --chip: #232323;
+  /* karta odlišená barvou od pozadí (články) */
+  --card: #1c1c1c;
+  --card-hover: #232323;
+  --text-soft: #e4e4e4;
+  --alert: #ff3b30;
+
+  --fs-hero: 44px;
+  --fs-h1: 32px;
+  --fs-h2: 26px;
+  --fs-lead: 18px;
+  --fs-link: 20px;
+  --fs-body: 16px;
+  --fs-small: 15px;
+  --fs-note: 14px;
+  --fs-btn: 16px;
+  --fs-nav: 16px;
+  --fs-name: 22px;
+
+  --lh-hero: 1.15;
+  --lh-head: 1.1;
+  --lh-body: 1.3;
+
+  --container: 1300px;
+  --gutter: 20px;
+  --header-h: 80px;
+  --icon: 52px;
+
+  --radius: 8px;
+  --radius-card: 8px;
+  --radius-sm: 4px;
+
+  --btn-h: 48px;
+  --btn-pad: 22px;
+  --tab-h: 40px;
+  --tab-pad: 16px;
+  --card-pad: 22px;
+  --section-pad: 48px;
+
+  /* Pohyb: jedna plynulá křivka a jedna délka pro celý web. Animují se jen
+     barvy, pozadí a drobné šipky – nic, co by přepočítávalo obrázky nebo layout. */
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --dur: 200ms;
+}
+
+@media (min-width: 26em) {
+  :root {
+    --fs-hero: 60px;
+    --fs-h1: 40px;
+    --fs-h2: 30px;
+    --fs-lead: 18px;
+    --fs-link: 22px;
+    --fs-name: 26px;
+    --icon: 64px;
+  }
+}
+
+@media (min-width: 48em) {
+  :root {
+    --gutter: 24px;
+    --card-pad: 32px;
+    --section-pad: 76px;
+  }
+}
+
+/* ── Základ ─────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: var(--yellow);
+  text-decoration: none;
+  transition: color var(--dur) var(--ease);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0 0 0.25em;
+  line-height: var(--lh-head);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+h1,
+h2 {
+  font-size: var(--fs-h1);
+}
+
+h3 {
+  font-size: var(--fs-h2);
+}
+
+p {
+  margin: 0 0 1em;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: calc(var(--container) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ico {
+  display: inline-block;
+  vertical-align: -0.15em;
+  flex: none;
+}
+
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--yellow);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Tlačítka (z IS) ───────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: var(--btn-h);
+  padding: 0 var(--btn-pad);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font: inherit;
+  font-weight: 600;
+  font-size: var(--fs-btn);
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.btn:hover {
+  text-decoration: none;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  color: var(--black);
+}
+
+.btn--light {
+  background: var(--white);
+  color: var(--black);
+}
+
+.btn--dark {
+  background: var(--black);
+  color: var(--white);
+}
+
+.btn--ghost {
+  background: var(--field);
+  color: var(--white);
+}
+
+.btn--primary {
+  background: var(--yellow);
+  color: var(--black);
+}
+
+.btn--primary:hover,
+.btn--primary:focus-visible {
+  background: #ffe64d;
+  border-color: #ffe64d;
+}
+
+/* Na žlutém podkladu by žlutý hover zmizel. */
+.band .btn--light:hover,
+.band .btn--dark:hover,
+.band .btn--light:focus-visible,
+.band .btn--dark:focus-visible {
+  background: var(--black);
+  border-color: var(--black);
+  color: var(--white);
+}
+
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--yellow);
+  font-weight: 700;
+  font-size: var(--fs-link);
+  line-height: 1.3;
+}
+
+.link-arrow--muted {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: var(--fs-note);
+}
+
+.link-arrow--muted:hover {
+  color: var(--yellow);
+}
+
+/* ── Žlutý pás (hero IS) ───────────────────────────────────────────────── */
+.band {
+  background: var(--yellow);
+  color: var(--black);
+  text-align: center;
+  padding: 64px 0 60px;
+}
+
+.band :focus-visible {
+  outline-color: var(--black);
+}
+
+.band h1,
+.band__title {
+  font-size: var(--fs-hero);
+  line-height: var(--lh-hero);
+  margin-bottom: 12px;
+}
+
+.band__lead {
+  max-width: 46ch;
+  margin: 0 auto 12px;
+  font-size: var(--fs-lead);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.band__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+@media (min-width: 48em) {
+  .band {
+    padding: 151px 0 150px;
+  }
+}
+
+/* ── Sekce ──────────────────────────────────────────────────────────────── */
+.section {
+  padding: var(--section-pad) 0;
+}
+
+/* Nadpis sekce s odkazem vpravo („Všechny články →“). */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-bottom: 45px;
+}
+
+.section-head h1,
+.section-head h2 {
+  margin: 0;
+}
+
+/* Nadpis sekce (h2) jako ve Frameru, se žlutým čtverečkem místo tečky. Menší než h1 stránky. */
+.display {
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.display::after {
+  content: '';
+  display: inline-block;
+  width: 0.18em;
+  height: 0.18em;
+  margin-left: 0.08em;
+  border-radius: 18%;
+  background: var(--yellow);
+}
+
+/* ── Záložky (z IS) ────────────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  height: var(--tab-h);
+  padding: 0 var(--tab-pad);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--field);
+  color: var(--white);
+  font: inherit;
+  font-weight: 600;
+  font-size: var(--fs-btn);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tab:hover {
+  background: var(--field-hover);
+}
+
+.tab[aria-selected='true'],
+.tab[aria-current='page'] {
+  background: var(--yellow);
+  color: var(--black);
+}
+
+/* ── Karta (z IS) ──────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--card-pad);
+}
+
+.card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.card__head h2 {
+  margin: 0;
+}
+
+.card__lead {
+  margin: 9px 0 7px;
+  max-width: 105ch;
+}
+
+.badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  height: 39px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  background: var(--yellow);
+  color: var(--black);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* ── Ikona + nadpis + text (vlastnosti, hodnoty) ───────────────────────── */
+.feature {
+  display: grid;
+  grid-template-columns: var(--icon) minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: start;
+  align-content: start;
+}
+
+.feature__icon {
+  grid-row: span 2;
+  color: var(--yellow);
+  line-height: 0;
+}
+
+.feature__icon .ico {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.feature__img {
+  display: block;
+  height: 64px;
+  width: auto;
+}
+
+.feature h3 {
+  margin: 0 0 5px;
+}
+
+.feature p {
+  margin: 0;
+  font-size: var(--fs-small);
+  line-height: 1.3;
+}
+
+/* ── Čip (ze statnidluh) ───────────────────────────────────────────────── */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: var(--chip);
+  font-size: 13px;
+  font-weight: 500;
+  color: #b0b0b0;
+}
+
+.chip .ico {
+  color: var(--yellow);
+}
+
+.chip strong {
+  color: var(--white);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Mřížky ─────────────────────────────────────────────────────────────── */
+.grid-3,
+.people-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.grid-3 {
+  grid-template-columns: 1fr;
+  gap: 40px 30px;
+}
+
+@media (min-width: 40em) {
+  .grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 62em) {
+  .grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Lidé 1:1 podle IS. */
+.people-grid {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 50px 30px;
+}
+
+@media (max-width: 30em) {
+  .people-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 16px;
+  }
+}
+
+/* ── Náhledový obrázek (fotka osoby, obrázek článku) ───────────────────── */
+/* Obrázek stojí – žádné přibližování ani naklápění. Přepočítávání fotky při
+   pohybu dělalo roztřesený text v obrázcích a na zaoblených hranách prosvítal
+   podklad. Podklad je proto tmavý jako karta; žlutý je jen u výplně bez fotky. */
+.thumb {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--field);
+}
+
+.thumb > * {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb--empty {
+  background: var(--yellow);
+  color: var(--black);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.thumb--empty > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Podtržení titulku při najetí: žlutá linka se vysune zleva doprava (i přes více řádků). */
+.underline {
+  background: linear-gradient(var(--yellow), var(--yellow)) no-repeat left bottom / 0% 2px;
+  padding-bottom: 3px;
+  transition: background-size 380ms var(--ease);
+}
+
+a:hover .underline,
+a:focus-visible .underline {
+  background-size: 100% 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation: none !important;
+  }
+}
+
+/* ══ Obsahové stránky (detail článku, program, manifest, o nás…) ═══════════ */
+
+.page {
+  padding-top: 32px;
+  padding-bottom: var(--section-pad);
+}
+
+/* Drobečková navigace */
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 40px;
+  font-size: var(--fs-note);
+  color: var(--dim);
+}
+
+.crumbs a {
+  color: var(--muted);
+}
+
+.crumbs a:hover {
+  color: var(--yellow);
+  text-decoration: none;
+}
+
+/* Text vlevo v čitelné šířce, doplňkový sloupec vpravo (na mobilu pod textem). */
+.page-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 64px;
+}
+
+@media (min-width: 62em) {
+  .page-layout {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 56px;
+  }
+}
+
+.page-aside {
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 62em) {
+  .page-aside {
+    padding-top: 0;
+    border-top: 0;
+  }
+  .page-aside__inner {
+    position: sticky;
+    top: calc(var(--header-h) + 32px);
+  }
+}
+
+.page-aside h2 {
+  margin: 0 0 20px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+/* Hlavní nadpis stránky (h1) – větší než nadpisy sekcí (.display). */
+.page-title {
+  margin: 0;
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.lede {
+  margin: 20px 0 0;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0 0 16px;
+  font-size: var(--fs-note);
+  color: var(--muted);
+}
+
+/* Žlutý štítek (rubrika, pilíř) – tvar jako cenovka v IS. */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+  background: var(--yellow);
+  color: var(--black);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ── Dlouhý text z CMS ─────────────────────────────────────────────────── */
+.prose {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--text-soft);
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose p {
+  margin: 0 0 1.1em;
+}
+
+.prose h2 {
+  margin: 1.9em 0 0.55em;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--yellow);
+  scroll-margin-top: calc(var(--header-h) + 24px);
+}
+
+.prose h3 {
+  margin: 1.7em 0 0.5em;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--yellow);
+}
+
+.prose h4 {
+  margin: 1.4em 0 0.4em;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.prose strong,
+.prose b {
+  color: var(--white);
+}
+
+.prose a {
+  color: var(--white);
+  text-decoration: underline;
+  text-decoration-color: var(--yellow);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.prose a:hover {
+  color: var(--yellow);
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 1.1em;
+  padding-left: 1.3em;
+}
+
+.prose li {
+  margin-bottom: 0.5em;
+}
+
+.prose li::marker {
+  color: var(--yellow);
+}
+
+.prose blockquote {
+  margin: 1.6em 0;
+  padding: 4px 0 4px 20px;
+  border-left: 3px solid var(--yellow);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--white);
+}
+
+.prose figure {
+  margin: 2em 0;
+}
+
+.prose img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+}
+
+.prose figcaption {
+  margin-top: 10px;
+  font-size: var(--fs-note);
+  color: var(--dim);
+}
+
+.prose table {
+  width: 100%;
+  margin: 1.5em 0;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.prose th,
+.prose td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+/* YouTube a jiná vložená videa – vždy celá šířka v poměru 16:9. */
+.prose iframe {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: var(--radius);
+}
+
+.prose .wp-block-embed__wrapper {
+  position: static;
+}
+
+.prose .wp-block-embed__wrapper::before {
+  display: none;
+}
+
+/* Tlačítka a zvýraznění uvnitř textu z CMS (převedená z Elementoru). */
+.prose a.btn {
+  color: var(--white);
+  text-decoration: none;
+}
+
+.prose a.btn:hover,
+.prose a.btn:focus-visible {
+  color: var(--black);
+}
+
+.prose .btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 1.4em 0;
+}
+
+.prose .callout {
+  margin: 0.4em 0 1.2em;
+  padding-left: 16px;
+  border-left: 3px solid var(--yellow);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--white);
+}

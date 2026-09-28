@@ -1,0 +1,153 @@
+---
+// Karta článku. Varianty:
+//   featured – velký hlavní článek (homepage vlevo)
+//   compact  – vodorovná karta vedle hlavního článku
+//   default  – karta do mřížky (výpis, související články)
+// Bez rámečku a podkladu (vzdušně jako ve Frameru); při najetí titulek podtrhne žlutá linka zleva doprava.
+import { Image } from 'astro:assets';
+import type { Article } from '../lib/cms';
+import { formatDate } from '../lib/format';
+
+interface Props {
+  article: Article;
+  variant?: 'default' | 'featured' | 'compact';
+}
+
+const { article, variant = 'default' } = Astro.props;
+const sizes = variant === 'featured' ? '(min-width: 62em) 760px, 100vw' : variant === 'compact' ? '(min-width: 40em) 300px, 100vw' : '(min-width: 62em) 420px, 100vw';
+---
+
+<a class:list={['article', `article--${variant}`]} href={`/clanky/${article.slug}/`}>
+  {
+    article.cover ? (
+      <span class="thumb article__thumb">
+        <Image src={article.cover.url} alt={article.cover.alt} width={article.cover.width ?? 1200} height={article.cover.height ?? 675} widths={[320, 640, 960, 1280]} sizes={sizes} />
+      </span>
+    ) : (
+      <span class="thumb thumb--empty article__thumb" aria-hidden="true">
+        <span>
+          <img class="article__mark" src="/logo-voluntia.svg" alt="" width="200" height="55" />
+        </span>
+      </span>
+    )
+  }
+  <span class="article__body">
+    <span class="article__meta">
+      {article.category && <span class="article__tag">{article.category.name}</span>}
+      <time datetime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
+    </span>
+    <span class="article__title"><span class="underline">{article.title}</span></span>
+    {article.excerpt && <span class="article__excerpt">{article.excerpt}</span>}
+  </span>
+</a>
+
+<style>
+  /* Karta bez rámečku a podkladu – náhled se zaoblenými rohy a text pod ním. */
+  .article {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: var(--white);
+  }
+
+  .article:hover {
+    text-decoration: none;
+  }
+
+  .article__thumb {
+    flex: none;
+    aspect-ratio: 16 / 9;
+  }
+
+  .article__mark {
+    width: 40%;
+    height: auto;
+    filter: brightness(0);
+  }
+
+  .article__body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px 0 0;
+  }
+
+  .article__meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  /* Štítek rubriky – tvar jako cenovka v IS. */
+  .article__tag {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 8px;
+    border-radius: var(--radius-sm);
+    background: var(--field);
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .article__title {
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+  }
+
+  .article__excerpt {
+    display: -webkit-box;
+    font-size: var(--fs-small);
+    line-height: 1.45;
+    color: var(--muted);
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Hlavní článek */
+  .article--featured .article__body {
+    gap: 12px;
+    padding-top: 24px;
+  }
+  .article--featured .article__tag {
+    background: var(--yellow);
+    color: var(--black);
+  }
+  .article--featured .article__title {
+    font-size: clamp(26px, 2.6vw, 34px);
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+  }
+  .article--featured .article__excerpt {
+    font-size: 16px;
+  }
+
+  /* Vodorovná karta */
+  @media (min-width: 40em) {
+    .article--compact {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 22px;
+    }
+    .article--compact .article__thumb {
+      width: 48%;
+      max-width: 300px;
+    }
+    .article--compact .article__body {
+      padding: 0;
+    }
+    .article--compact .article__title {
+      font-size: 19px;
+    }
+    .article--compact .article__excerpt {
+      -webkit-line-clamp: 2;
+    }
+  }
+</style>

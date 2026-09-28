@@ -1,0 +1,85 @@
+---
+// Karta konkrétního návrhu z programu. Odlišená barvou jako karty článků (bez rámečku).
+import Icon from './Icon.astro';
+import type { Policy } from '../lib/cms';
+
+interface Props {
+  policy: Policy;
+  pillarSlug: string;
+  /** compact = jen titulek (postranní sloupec) */
+  compact?: boolean;
+}
+
+const { policy, pillarSlug, compact = false } = Astro.props;
+---
+
+<a class:list={['policy', { 'policy--compact': compact }]} href={`/program/${pillarSlug}/${policy.slug}/`}>
+  <span class="policy__body">
+    <span class="policy__title">{policy.title}</span>
+    {!compact && policy.excerpt && <span class="policy__excerpt">{policy.excerpt}</span>}
+  </span>
+  <Icon name="ArrowRight" size={20} class="policy__arrow" />
+</a>
+
+<style>
+  .policy {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    height: 100%;
+    padding: 22px 22px 24px;
+    border-radius: 12px;
+    background: var(--card);
+    color: var(--white);
+    transition: background-color var(--dur) var(--ease);
+  }
+  .policy:hover {
+    background: var(--card-hover);
+    text-decoration: none;
+  }
+  .policy__body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .policy__title {
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+  .policy:hover .policy__title {
+    text-decoration: underline;
+    text-decoration-color: var(--yellow);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+  .policy__excerpt {
+    display: -webkit-box;
+    font-size: var(--fs-small);
+    line-height: 1.45;
+    color: var(--muted);
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .policy :global(.policy__arrow) {
+    flex: none;
+    margin-top: 2px;
+    color: var(--dim);
+    transition: transform var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+  .policy:hover :global(.policy__arrow) {
+    color: var(--yellow);
+    transform: translateX(2px);
+  }
+  .policy--compact {
+    align-items: center;
+    padding: 16px 18px;
+  }
+  .policy--compact .policy__title {
+    font-size: 16px;
+  }
+</style>

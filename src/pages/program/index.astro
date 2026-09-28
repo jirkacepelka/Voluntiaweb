@@ -1,0 +1,64 @@
+---
+// Přehled programu: hlavní postoje a přepínání mezi pilíři (stejně jako na úvodní stránce).
+// Konkrétní kroky jsou až na stránkách jednotlivých pilířů.
+import Base from '../../layouts/Base.astro';
+import Crumbs from '../../components/Crumbs.astro';
+import DonateCta from '../../components/DonateCta.astro';
+import Icon from '../../components/Icon.astro';
+import ProgramTabs from '../../components/ProgramTabs.astro';
+import { programPrinciples } from '../../data/program';
+---
+
+<Base title="Program" description="Program Libertariánské strany Voluntia: zeštíhlit stát, zastavět stát, zastavit stát.">
+  <div class="container page intro-wrap">
+    <Crumbs items={[{ label: 'Úvod', href: '/' }, { label: 'Program' }]} />
+
+    <header class="intro">
+      <h1 class="page-title">Program</h1>
+      <ul class="principles">
+        {
+          programPrinciples.map((p) => (
+            <li>
+              <Icon name="Check" size={20} class="principles__icon" />
+              {p}
+            </li>
+          ))
+        }
+      </ul>
+    </header>
+  </div>
+
+  <ProgramTabs heading={false} />
+
+  <DonateCta />
+</Base>
+
+<style>
+  /* Záložky pilířů navazují hned pod postoji, bez mezery dvou sekcí. */
+  .intro-wrap {
+    padding-bottom: 0;
+  }
+  .intro {
+    max-width: 820px;
+  }
+  .principles {
+    display: grid;
+    gap: 12px;
+    margin: 28px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-lead);
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  .principles li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .principles :global(.principles__icon) {
+    flex: none;
+    margin-top: 3px;
+    color: var(--yellow);
+  }
+</style>

@@ -1,0 +1,133 @@
+---
+// Kontakty a identifikační údaje strany – sekce na konci stránky O nás (#kontakt).
+import Icon from './Icon.astro';
+import { contact, links } from '../config';
+
+const cards = [
+  { icon: 'Mail', title: 'Napište nám', value: contact.email, href: `mailto:${contact.email}` },
+  { icon: 'Newspaper', title: 'Kontakt pro média', value: contact.mediaEmail, href: `mailto:${contact.mediaEmail}` },
+  { icon: 'MessagesSquare', title: 'Komunita na Discordu', value: 'Přidej se do diskuse', href: links.discord },
+] as const;
+---
+
+<section class="contact" id="kontakt" aria-labelledby="kontakt-title">
+  <h2 id="kontakt-title">Kontakt</h2>
+  <p class="contact__lead">Ozvěte se nám e-mailem, nebo se připojte ke komunitě na Discordu.</p>
+
+  <ul class="cards">
+    {
+      cards.map((c) => (
+        <li>
+          <a class="card-link" href={c.href}>
+            <Icon name={c.icon} size={24} class="card-link__icon" />
+            <span class="card-link__title">{c.title}</span>
+            <span class="card-link__value">{c.value}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <dl class="ident">
+    <div>
+      <dt>Název</dt>
+      <dd>{contact.name}</dd>
+    </div>
+    <div>
+      <dt>Sídlo</dt>
+      <dd>{contact.address}</dd>
+    </div>
+    <div>
+      <dt>IČ</dt>
+      <dd>{contact.ico}</dd>
+    </div>
+    <div>
+      <dt>DIČ</dt>
+      <dd>{contact.dic}</dd>
+    </div>
+    <div>
+      <dt>ID datové schránky</dt>
+      <dd>{contact.dataBox}</dd>
+    </div>
+  </dl>
+</section>
+
+<style>
+  .contact {
+    margin-top: 64px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+    scroll-margin-top: calc(var(--header-h) + 24px);
+  }
+  h2 {
+    margin: 0 0 8px;
+    font-size: clamp(24px, 2.4vw, 30px);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+  }
+  .contact__lead {
+    margin: 0 0 24px;
+    color: var(--muted);
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 40em) {
+    .cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .card-link {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    height: 100%;
+    padding: 20px;
+    border-radius: 12px;
+    background: var(--card);
+    color: var(--white);
+    transition: background-color var(--dur) var(--ease);
+  }
+  .card-link:hover {
+    background: var(--card-hover);
+    text-decoration: none;
+  }
+  .card-link :global(.card-link__icon) {
+    margin-bottom: 10px;
+    color: var(--yellow);
+  }
+  .card-link__title {
+    font-size: var(--fs-note);
+    color: var(--muted);
+  }
+  .card-link__value {
+    font-size: 16px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+  .ident {
+    display: grid;
+    margin: 28px 0 0;
+  }
+  .ident > div {
+    display: grid;
+    grid-template-columns: minmax(0, 180px) minmax(0, 1fr);
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+  }
+  dt {
+    color: var(--muted);
+  }
+  dd {
+    margin: 0;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

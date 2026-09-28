@@ -1,0 +1,170 @@
+---
+// Jeden pilíř programu a seznam jeho konkrétních kroků (titulek, první odstavec, odkaz „Více“).
+import type { GetStaticPaths } from 'astro';
+import Base from '../../../layouts/Base.astro';
+import Crumbs from '../../../components/Crumbs.astro';
+import DonateCta from '../../../components/DonateCta.astro';
+import Icon from '../../../components/Icon.astro';
+import { pillars } from '../../../data/program';
+import { firstParagraphText } from '../../../lib/cms/html';
+import { hashtag, loadProgram } from '../../../lib/program';
+
+export const getStaticPaths = (() => pillars.map((p) => ({ params: { pillar: p.slug } }))) satisfies GetStaticPaths;
+
+const program = await loadProgram();
+const pillar = program.find((p) => p.slug === Astro.params.pillar)!;
+const others = program.filter((p) => p.slug !== pillar.slug);
+---
+
+<Base title={pillar.title} description={pillar.text}>
+  <div class="container page">
+    <Crumbs items={[{ label: 'Program', href: '/program/' }, { label: pillar.title }]} />
+
+    <header class="head">
+      <p class="meta"><span class="tag">{pillar.tag}</span></p>
+      <h1 class="page-title">{pillar.title}</h1>
+      <p class="lede">{pillar.text}</p>
+      <p class="punch">{pillar.punchline} <span>{hashtag(pillar.tag)}</span></p>
+    </header>
+
+    <section aria-labelledby="policies-title">
+      <h2 id="policies-title" class="sub">Konkrétní kroky</h2>
+      {
+        pillar.policies.length > 0 ? (
+          <ul class="policies">
+            {pillar.policies.map((policy) => {
+              const href = `/program/${pillar.slug}/${policy.slug}/`;
+              return (
+                <li class="step">
+                  <h3 class="step__title">
+                    <a href={href}>
+                      <span class="underline">{policy.title}</span>
+                    </a>
+                  </h3>
+                  <p class="step__text">{firstParagraphText(policy.contentHtml, 600) || policy.excerpt}</p>
+                  <a class="step__more" href={href} aria-label={`Více: ${policy.title}`}>
+                    Více <Icon name="ArrowRight" size={18} />
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p class="muted">Konkrétní návrhy doplníme.</p>
+        )
+      }
+    </section>
+
+    <nav class="others" aria-label="Další pilíře programu">
+      <span class="others__label">Další pilíře</span>
+      <div class="tabs">
+        {others.map((p) => <a class="tab" href={`/program/${p.slug}/`}>{p.tag}</a>)}
+        <a class="tab" href="/program/">Celý program</a>
+      </div>
+    </nav>
+  </div>
+
+  <DonateCta />
+</Base>
+
+<style>
+  .head {
+    max-width: 820px;
+  }
+  .punch {
+    margin: 16px 0 0;
+    font-size: var(--fs-lead);
+    font-weight: 700;
+  }
+  .punch span {
+    color: var(--yellow);
+    white-space: nowrap;
+  }
+  .sub {
+    margin: 64px 0 24px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--yellow);
+  }
+  .policies {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px 48px;
+  }
+  .step__title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+  .step__title a {
+    color: var(--yellow);
+  }
+  .step__title a:hover {
+    text-decoration: none;
+  }
+  .step__text {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-soft);
+  }
+  .step__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    justify-self: start;
+    color: var(--yellow);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .step__more :global(svg) {
+    transition: transform var(--dur) var(--ease);
+  }
+  .step__more:hover {
+    text-decoration: none;
+  }
+  .step__more:hover :global(svg) {
+    transform: translateX(3px);
+  }
+  @media (min-width: 48em) {
+    .step {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    .step__title {
+      grid-column: 1 / -1;
+    }
+    .step__more {
+      align-self: end;
+    }
+  }
+  .others {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    margin-top: 64px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+  .others__label {
+    font-size: var(--fs-note);
+    color: var(--muted);
+  }
+  .others .tabs {
+    margin: 0;
+  }
+  .others .tab:hover {
+    text-decoration: none;
+  }
+</style>

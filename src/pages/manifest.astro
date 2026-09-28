@@ -1,0 +1,61 @@
+---
+// Manifest: dlouhý dokument s obsahem kapitol vpravo.
+import ContentPage from '../layouts/ContentPage.astro';
+import Toc from '../components/Toc.astro';
+import ShareBar from '../components/ShareBar.astro';
+import { cms } from '../lib/cms';
+import { addHeadingIds, removeElements } from '../lib/cms/html';
+
+const page = await cms.getPage('manifest');
+if (!page) throw new Error('Stránku „manifest“ se nepodařilo načíst z CMS.');
+
+const subtitle = 'Pro svobodu, pro odpovědnost, pro budoucnost';
+// Podtitul je v obsahu z CMS jako nadpis před prvním odstavcem – vykreslujeme ho jako perex.
+const firstParagraph = page.contentHtml.search(/<p[\s>]/);
+let content = page.contentHtml.replace(/<h[3-6][^>]*>([\s\S]*?)<\/h[3-6]>/, (h, _inner, offset: number) =>
+  firstParagraph === -1 || offset < firstParagraph ? '' : h,
+);
+// Tlačítka „↑ zpět na kapitoly“ z Elementoru – obsah kapitol je vpravo, takže je nepotřebujeme.
+content = removeElements(content, /<div[^>]*class="[^"]*elementor-widget-button\b[^"]*"[^>]*>/i);
+content = content.replace(/<a[^>]*href="#home"[^>]*>[\s\S]*?<\/a>/gi, '');
+const { html, headings } = addHeadingIds(content);
+---
+
+<ContentPage title="Manifest Libertariánské strany Voluntia" metaTitle="Manifest" lede={subtitle} crumbs={[{ label: 'Úvod', href: '/' }, { label: 'Manifest' }]}>
+  <div class="prose manifest" set:html={html} />
+  <ShareBar title="Manifest Libertariánské strany Voluntia" label="Sdílet manifest" />
+  {headings.length > 1 && <Toc slot="aside" headings={headings} />}
+</ContentPage>
+
+<style>
+  /* Začátek kapitoly: malá ikona vlevo vedle nadpisu a citátu (v obsahu z CMS je ikona
+     v samostatném bloku nad nimi). Blok, který přímo obsahuje obrázek i nadpis, dostane
+     rozvržení vedle sebe. */
+  .manifest :global(div:has(> div > figure img):has(> div h2)),
+  .manifest :global(div:has(> figure img):has(> div h2)) {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin: 2.2em 0 1.3em;
+  }
+  .manifest :global(div:has(> div > figure img):has(> div h2) figure),
+  .manifest :global(div:has(> figure img):has(> div h2) > figure) {
+    flex: none;
+    width: 88px;
+    margin: 4px 0 0;
+  }
+  .manifest :global(div:has(> div > figure img):has(> div h2) img),
+  .manifest :global(div:has(> figure img):has(> div h2) > figure img) {
+    width: 88px;
+    height: 88px;
+    object-fit: contain;
+    border-radius: 0;
+  }
+  .manifest :global(div:has(> div > figure img):has(> div h2) h2),
+  .manifest :global(div:has(> figure img):has(> div h2) h2) {
+    margin-top: 0;
+  }
+  .manifest :global(div:has(> div > figure img):has(> div h2) p) {
+    margin-bottom: 0;
+  }
+</style>

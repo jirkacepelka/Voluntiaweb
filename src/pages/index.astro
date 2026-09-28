@@ -1,0 +1,80 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import ProgramTabs from '../components/ProgramTabs.astro';
+import Values from '../components/Values.astro';
+import PersonCard from '../components/PersonCard.astro';
+import DonateCta from '../components/DonateCta.astro';
+import Icon from '../components/Icon.astro';
+import { cms } from '../lib/cms';
+import { links } from '../config';
+
+const [featured, ...rest] = (await cms.listArticles()).slice(0, 3);
+const leaders = await cms.listPeople({ group: 'lidri' });
+---
+
+<Base>
+  <Hero />
+
+  <section class="section" id="novinky">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="display">Novinky</h2>
+        <a class="link-arrow link-arrow--muted" href={links.news}>Všechny články <Icon name="ArrowRight" /></a>
+      </div>
+      {
+        featured && (
+          <div class="news">
+            <ArticleCard article={featured} variant="featured" />
+            <div class="news__side">
+              {rest.map((a) => (
+                <ArticleCard article={a} variant="compact" />
+              ))}
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <ProgramTabs />
+
+  <Values />
+
+  <section class="section" id="lide">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="display">Lidé</h2>
+        <a class="link-arrow link-arrow--muted" href={links.people}>Všichni lidé v portálu člena <Icon name="ArrowUpRight" /></a>
+      </div>
+      <ul class="people-grid">
+        {leaders.slice(0, 10).map((p) => <PersonCard person={p} />)}
+      </ul>
+    </div>
+  </section>
+
+  <DonateCta />
+</Base>
+
+<style>
+  .news {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .news__side {
+    display: grid;
+    align-content: start;
+    gap: 32px;
+  }
+  @media (min-width: 62em) {
+    .news {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: 56px;
+    }
+    .news__side {
+      gap: 32px;
+    }
+  }
+</style>

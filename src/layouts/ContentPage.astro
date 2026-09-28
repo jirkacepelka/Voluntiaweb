@@ -1,0 +1,60 @@
+---
+// Rozvržení obsahové stránky: drobečky, titulek, perex, text vlevo a volitelný sloupec vpravo
+// (slot "aside"). Bez sloupce je text v čitelné šířce.
+import Base from './Base.astro';
+import Crumbs from '../components/Crumbs.astro';
+import DonateCta from '../components/DonateCta.astro';
+
+interface Props {
+  title: string;
+  /** Titulek v <title>, když se liší od nadpisu stránky. */
+  metaTitle?: string;
+  description?: string;
+  lede?: string;
+  crumbs?: { label: string; href?: string }[];
+  donate?: boolean;
+}
+
+const { title, metaTitle, description, lede, crumbs = [{ label: 'Úvod', href: '/' }, { label: title }], donate = true } = Astro.props;
+const hasAside = Astro.slots.has('aside');
+---
+
+<Base title={metaTitle ?? title} description={description ?? lede}>
+  <div class="container page">
+    <Crumbs items={crumbs} />
+
+    <div class:list={[hasAside ? 'page-layout' : 'page-single']}>
+      <article>
+        <header>
+          <slot name="meta" />
+          <h1 class="page-title">{title}</h1>
+          {lede && <p class="lede">{lede}</p>}
+        </header>
+        <div class="content">
+          <slot />
+        </div>
+      </article>
+
+      {
+        hasAside && (
+          <aside class="page-aside">
+            <div class="page-aside__inner">
+              <slot name="aside" />
+            </div>
+          </aside>
+        )
+      }
+    </div>
+  </div>
+
+  {donate && <DonateCta />}
+</Base>
+
+<style>
+  .page-single {
+    max-width: 820px;
+  }
+  .content {
+    margin-top: 40px;
+  }
+</style>

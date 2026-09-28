@@ -1,0 +1,126 @@
+---
+// Detail článku: text v čitelném sloupci vlevo, další články v užším sloupci vpravo.
+// Typografie dlouhého textu (.prose) vychází ze statnidluh (.doc).
+import type { GetStaticPaths } from 'astro';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import ArticleMini from '../../components/ArticleMini.astro';
+import Crumbs from '../../components/Crumbs.astro';
+import DonateCta from '../../components/DonateCta.astro';
+import Icon from '../../components/Icon.astro';
+import ShareBar from '../../components/ShareBar.astro';
+import { cms } from '../../lib/cms';
+import { stripLeadingTitle } from '../../lib/cms/html';
+import { stripTags } from '../../lib/cms/http';
+import { formatDate } from '../../lib/format';
+
+export const getStaticPaths = (async () => {
+  const articles = await cms.listArticles();
+  return articles.map((a) => ({ params: { slug: a.slug } }));
+}) satisfies GetStaticPaths;
+
+const { slug } = Astro.params;
+// Seznam nemusí obsahovat celé tělo článku (záleží na zdroji), detail si proto načteme zvlášť.
+const article = await cms.getArticle(slug);
+if (!article) throw new Error(`Článek „${slug}“ se nepodařilo načíst z CMS.`);
+
+const related = (await cms.listArticles()).filter((a) => a.slug !== slug).slice(0, 3);
+
+const contentHtml = stripLeadingTitle(article.contentHtml, article.title);
+const plainText = stripTags(contentHtml);
+// Automaticky vygenerovaný perex (WordPress) je jen začátek textu – pak ho neopakujeme.
+const excerptStart = article.excerpt.replace(/…$/, '').slice(0, 60);
+const showLede = excerptStart !== '' && !plainText.startsWith(excerptStart);
+const readingMinutes = Math.max(1, Math.round(plainText.split(/\s+/).length / 200));
+---
+
+<Base title={article.title} description={article.excerpt} image={article.cover?.url}>
+  <div class="container page">
+    <Crumbs items={[{ label: 'Články', href: '/clanky/' }, ...(article.category ? [{ label: article.category.name }] : [])]} />
+
+    <div class="page-layout">
+      <article>
+        <header>
+          <p class="meta">
+            {article.category && <span class="tag">{article.category.name}</span>}
+            <time datetime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
+            <span aria-hidden="true">·</span>
+            <span>{readingMinutes} min čtení</span>
+            {
+              article.author && (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <span>{article.author}</span>
+                </>
+              )
+            }
+          </p>
+          <h1 class="page-title">{article.title}</h1>
+          {showLede && <p class="lede">{article.excerpt}</p>}
+        </header>
+
+        {
+          article.cover && (
+            <Image
+              class="cover"
+              src={article.cover.url}
+              alt={article.cover.alt}
+              width={article.cover.width ?? 1600}
+              height={article.cover.height ?? 900}
+              widths={[830, 1660]}
+              sizes="(min-width: 62em) 830px, 100vw"
+              loading="eager"
+            />
+          )
+        }
+
+        <div class="prose body" set:html={contentHtml} />
+
+        <ShareBar title={article.title} label="Sdílet článek" />
+      </article>
+
+      {
+        related.length > 0 && (
+          <aside class="page-aside" aria-labelledby="related-title">
+            <div class="page-aside__inner">
+              <h2 id="related-title">Další články</h2>
+              <ul class="related">
+                {related.map((a) => (
+                  <li>
+                    <ArticleMini article={a} />
+                  </li>
+                ))}
+              </ul>
+              <a class="link-arrow link-arrow--muted" href="/clanky/">
+                Všechny články <Icon name="ArrowRight" />
+              </a>
+            </div>
+          </aside>
+        )
+      }
+    </div>
+  </div>
+
+  <DonateCta />
+</Base>
+
+<style>
+  article :global(.cover) {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 36px;
+    border-radius: 12px;
+  }
+  .body {
+    margin-top: 36px;
+  }
+  .related {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: 0 0 24px;
+    padding: 0;
+    list-style: none;
+  }
+</style>

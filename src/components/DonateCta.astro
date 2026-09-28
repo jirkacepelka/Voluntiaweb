@@ -1,0 +1,192 @@
+---
+// Výzva k podpoře – rozložení z prvního náčrtu: žlutý blok uvnitř stránky,
+// vlevo nadpis, vpravo tři široká tlačítka. Dekorace je značka Voluntie jako v hero.
+import Icon from './Icon.astro';
+import VoluntiaMark from './VoluntiaMark.astro';
+import { links } from '../config';
+
+const actions = [
+  { label: 'Přispět na provoz strany', href: links.donate, variant: 'dark' },
+  { label: 'Stát se členem', href: links.signupMember, variant: 'light' },
+  { label: 'Zapojit se jako dobrovolník', href: links.volunteer, variant: 'outline' },
+];
+---
+
+<section class="section donate-wrap">
+  <div class="container">
+    <div class="donate">
+      <VoluntiaMark class="donate__mark" />
+
+      <div class="donate__text">
+        <h2>Pomozte Voluntii s&nbsp;kampaní.</h2>
+        <p class="donate__lead">Každý příspěvek se počítá.</p>
+        <a class="donate__report" href={links.transparency}>
+          Transparentní financování a výroční zpráva <Icon name="ArrowRight" size={16} />
+        </a>
+      </div>
+
+      <div class="donate__actions">
+        {
+          actions.map((a) => (
+            <a class={`donate__btn donate__btn--${a.variant}`} href={a.href}>
+              {a.label}
+              <Icon name="ArrowRight" size={22} class="donate__arrow" />
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .donate {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    align-items: center;
+    padding: 32px 24px;
+    border-radius: 16px;
+    background: var(--yellow);
+    color: var(--black);
+  }
+
+  @media (min-width: 48em) {
+    .donate {
+      padding: 64px;
+    }
+  }
+
+  @media (min-width: 62em) {
+    .donate {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      gap: 64px;
+      padding: 72px;
+    }
+  }
+
+  .donate :global(.donate__mark) {
+    position: absolute;
+    right: -70px;
+    bottom: -90px;
+    width: 340px;
+    height: auto;
+    color: var(--black);
+    opacity: 0.07;
+    transform: rotate(-12deg);
+    pointer-events: none;
+  }
+
+  .donate__text,
+  .donate__actions {
+    position: relative;
+  }
+
+  .donate__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: clamp(38px, 4.6vw, 60px);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+  }
+
+  .donate__lead {
+    margin: 0;
+    font-size: var(--fs-lead);
+    font-weight: 600;
+  }
+
+  .donate__report {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    color: var(--black);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .donate__report:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  :focus-visible {
+    outline-color: var(--black);
+  }
+
+  .donate__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .donate__btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 60px;
+    padding: 0 24px;
+    border: 2px solid var(--black);
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+
+  /* Tlačítko stojí, jen se změní odstín a šipka se nepatrně posune. */
+  .donate__btn:hover {
+    text-decoration: none;
+  }
+
+  .donate__btn :global(.donate__arrow) {
+    flex: none;
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .donate__btn:hover :global(.donate__arrow) {
+    transform: translateX(3px);
+  }
+
+  .donate__btn--dark {
+    background: var(--black);
+    color: var(--white);
+  }
+
+  .donate__btn--dark:hover {
+    background: #262626;
+    border-color: #262626;
+  }
+
+  .donate__btn--light {
+    background: var(--white);
+    border-color: var(--white);
+    color: var(--black);
+  }
+
+  .donate__btn--light:hover {
+    background: #f1f1f1;
+    border-color: #f1f1f1;
+  }
+
+  .donate__btn--outline {
+    color: var(--black);
+  }
+
+  .donate__btn--outline:hover {
+    background: var(--black);
+    color: var(--white);
+  }
+</style>

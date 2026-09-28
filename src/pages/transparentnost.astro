@@ -1,0 +1,110 @@
+---
+import ContentPage from '../layouts/ContentPage.astro';
+import Icon from '../components/Icon.astro';
+import { transparency } from '../config';
+---
+
+<ContentPage
+  title="Transparentnost"
+  lede="V rámci naplnění zákonných požadavků zde zveřejňujeme finanční zprávy strany a transparentní účty. Každý dar i výdaj je dohledatelný.">
+  <section aria-labelledby="reports-title">
+    <h2 id="reports-title" class="sub">Finanční zprávy</h2>
+    <ul class="list">
+      {
+        transparency.reports.map((r) => (
+          <li>
+            <a class="row" href={r.href}>
+              <Icon name="FileText" size={24} class="row__icon" />
+              <span class="row__label">{r.label}</span>
+              <Icon name="ArrowUpRight" size={20} class="row__arrow" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="note">Zprávy zveřejňuje Úřad pro dohled nad hospodařením politických stran a politických hnutí.</p>
+  </section>
+
+  <section aria-labelledby="accounts-title">
+    <h2 id="accounts-title" class="sub">Transparentní účty</h2>
+    <ul class="list">
+      {
+        transparency.accounts.map((a) => (
+          <li>
+            <a class="row" href={a.href}>
+              <Icon name="Landmark" size={24} class="row__icon" />
+              <span class="row__label">
+                {a.label}
+                <span class="row__sub">{a.number}</span>
+              </span>
+              <Icon name="ArrowUpRight" size={20} class="row__arrow" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</ContentPage>
+
+<style>
+  .sub {
+    margin: 0 0 16px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    color: var(--yellow);
+  }
+  section + section {
+    margin-top: 48px;
+  }
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    border-radius: 12px;
+    background: var(--card);
+    color: var(--white);
+    transition: background-color var(--dur) var(--ease);
+  }
+  .row:hover {
+    background: var(--card-hover);
+    text-decoration: none;
+  }
+  .row :global(.row__icon) {
+    color: var(--yellow);
+  }
+  .row__label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    font-weight: 700;
+  }
+  .row__sub {
+    font-size: var(--fs-note);
+    font-weight: 500;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .row :global(.row__arrow) {
+    color: var(--dim);
+    transition: color var(--dur) var(--ease);
+  }
+  .row:hover :global(.row__arrow) {
+    color: var(--yellow);
+  }
+  .note {
+    margin: 14px 0 0;
+    font-size: var(--fs-note);
+    color: var(--dim);
+  }
+</style>

@@ -1,0 +1,146 @@
+---
+// Program: hashtagy z Frameru jako záložky IS, obsah v kartě IS s naklopenou dlaždicí.
+import Icon from './Icon.astro';
+import { pillars } from '../data/program';
+
+interface Props {
+  /** Nadpis sekce s odkazem na celý program – na stránce programu se vynechá. */
+  heading?: boolean;
+}
+
+const { heading = true } = Astro.props;
+---
+
+<section class:list={['section', { 'section--bare': !heading }]} id="program">
+  <div class="container">
+    {
+      heading && (
+        <div class="section-head">
+          <h2 class="display">Program</h2>
+          <a class="link-arrow link-arrow--muted" href="/program/">Celý program <Icon name="ArrowRight" /></a>
+        </div>
+      )
+    }
+    <div class="tabs" role="tablist" aria-label="Pilíře programu">
+      {
+        pillars.map((p, i) => (
+          <button
+            class="tab"
+            type="button"
+            role="tab"
+            id={`tab-${p.slug}`}
+            aria-controls={`panel-${p.slug}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}>
+            {p.tag}
+          </button>
+        ))
+      }
+    </div>
+
+    {
+      pillars.map((p, i) => (
+        <div class="card pillar" role="tabpanel" id={`panel-${p.slug}`} aria-labelledby={`tab-${p.slug}`} hidden={i !== 0}>
+          <div class="pillar__tile" aria-hidden="true">
+            <span>#</span>
+          </div>
+          <div class="pillar__body">
+            <h3 class="pillar__title">{p.title}</h3>
+            <p class="card__lead">{p.text}</p>
+            <p class="pillar__punch">
+              {p.punchline} <span class="pillar__hash">{p.tag.toLowerCase().replace(/\s+/g, '')}</span>
+            </p>
+            <a class="link-arrow" href={`/program/${p.slug}/`}>
+              Konkrétní kroky <Icon name="ArrowRight" size={22} />
+            </a>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('#program [role="tab"]')];
+  const select = (tab: HTMLButtonElement) => {
+    for (const t of tabs) {
+      const on = t === tab;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')!)!.hidden = !on;
+    }
+  };
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => select(tab));
+    tab.addEventListener('keydown', (e) => {
+      const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!d) return;
+      const next = tabs[(i + d + tabs.length) % tabs.length];
+      select(next);
+      next.focus();
+    });
+  });
+</script>
+
+<style>
+  #program .section-head {
+    margin-bottom: 28px;
+  }
+  .section--bare {
+    padding-top: 40px;
+  }
+  .pillar {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    gap: 24px;
+  }
+  .pillar__body {
+    position: relative;
+    max-width: 760px;
+  }
+  .pillar__title {
+    margin: 0 0 4px;
+    font-size: var(--fs-h1);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+  }
+  .pillar__punch {
+    margin: 16px 0 20px;
+    font-size: var(--fs-lead);
+    font-weight: 700;
+  }
+  .pillar__hash {
+    color: var(--yellow);
+    white-space: nowrap;
+  }
+  /* Velká mírně naklopená dlaždice s mřížkou – prvek z Frameru. */
+  .pillar__tile {
+    display: none;
+  }
+  @media (min-width: 62em) {
+    .pillar {
+      grid-template-columns: minmax(0, 1fr) 280px;
+      align-items: center;
+    }
+    .pillar__tile {
+      grid-column: 2;
+      grid-row: 1;
+      display: grid;
+      place-items: center;
+      width: 220px;
+      height: 220px;
+      margin: -10px auto;
+      border-radius: 22%;
+      background: var(--yellow);
+      color: var(--black);
+      transform: rotate(6deg);
+    }
+    .pillar__tile span {
+      font-size: 140px;
+      font-weight: 800;
+      line-height: 1;
+      transform: rotate(-6deg);
+    }
+  }
+</style>

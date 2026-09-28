@@ -1,0 +1,142 @@
+---
+import ContentPage from '../layouts/ContentPage.astro';
+import Icon from '../components/Icon.astro';
+import { cms } from '../lib/cms';
+import { links } from '../config';
+
+const events = await cms.listUpcomingEvents();
+
+const day = new Intl.DateTimeFormat('cs-CZ', { day: 'numeric', timeZone: 'Europe/Prague' });
+const month = new Intl.DateTimeFormat('cs-CZ', { month: 'short', timeZone: 'Europe/Prague' });
+const full = new Intl.DateTimeFormat('cs-CZ', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Prague' });
+---
+
+<ContentPage title="Kalendář akcí" lede="Setkání, debaty a akce, kde se můžete potkat s lidmi z Voluntie." donate={false}>
+  {
+    events.length > 0 ? (
+      <ul class="events">
+        {events.map((e) => {
+          const start = new Date(e.startsAt);
+          const Tag = e.url ? 'a' : 'div';
+          return (
+            <li>
+              <Tag class="event" href={e.url ?? undefined}>
+                <span class="event__date" aria-hidden="true">
+                  <span class="event__day">{day.format(start)}</span>
+                  <span class="event__month">{month.format(start)}</span>
+                </span>
+                <span class="event__body">
+                  <span class="event__title">{e.title}</span>
+                  <span class="event__meta">
+                    <time datetime={e.startsAt}>{full.format(start)}</time>
+                    {e.place && <span> · {e.place}</span>}
+                  </span>
+                  {e.description && <span class="event__desc">{e.description}</span>}
+                </span>
+                {e.url && <Icon name="ArrowUpRight" size={20} class="event__arrow" />}
+              </Tag>
+            </li>
+          );
+        })}
+      </ul>
+    ) : (
+      <div class="empty">
+        <Icon name="CalendarDays" size={40} class="empty__icon" />
+        <h2>Momentálně nemáme vypsané žádné akce</h2>
+        <p>O nových setkáních dáváme vědět jako první na Discordu.</p>
+        <a class="btn btn--light" href={links.discord}>
+          Přidej se na Discord
+        </a>
+      </div>
+    )
+  }
+</ContentPage>
+
+<style>
+  .events {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .event {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 20px 16px 16px;
+    border-radius: 12px;
+    background: var(--card);
+    color: var(--white);
+    transition: background-color var(--dur) var(--ease);
+  }
+  a.event:hover {
+    background: var(--card-hover);
+    text-decoration: none;
+  }
+  .event__date {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius);
+    background: var(--yellow);
+    color: var(--black);
+    line-height: 1;
+  }
+  .event__day {
+    font-size: 24px;
+    font-weight: 800;
+  }
+  .event__month {
+    margin-top: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .event__body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+  }
+  .event__title {
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .event__meta,
+  .event__desc {
+    font-size: var(--fs-note);
+    color: var(--muted);
+  }
+  .event :global(.event__arrow) {
+    color: var(--dim);
+  }
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 32px;
+    border-radius: 12px;
+    background: var(--card);
+  }
+  .empty :global(.empty__icon) {
+    color: var(--yellow);
+  }
+  .empty h2 {
+    margin: 4px 0 0;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+  }
+  .empty p {
+    margin: 0 0 8px;
+    color: var(--muted);
+  }
+</style>

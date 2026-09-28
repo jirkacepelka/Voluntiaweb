@@ -1,0 +1,102 @@
+---
+// Detail konkrétního návrhu – stejné rozvržení jako detail článku.
+import type { GetStaticPaths } from 'astro';
+import { Image } from 'astro:assets';
+import Base from '../../../layouts/Base.astro';
+import Crumbs from '../../../components/Crumbs.astro';
+import DonateCta from '../../../components/DonateCta.astro';
+import Icon from '../../../components/Icon.astro';
+import PolicyCard from '../../../components/PolicyCard.astro';
+import ShareBar from '../../../components/ShareBar.astro';
+import { loadProgram } from '../../../lib/program';
+
+export const getStaticPaths = (async () => {
+  const program = await loadProgram();
+  return program.flatMap((pillar) => pillar.policies.map((policy) => ({ params: { pillar: pillar.slug, policy: policy.slug } })));
+}) satisfies GetStaticPaths;
+
+const program = await loadProgram();
+const pillar = program.find((p) => p.slug === Astro.params.pillar)!;
+const policy = pillar.policies.find((p) => p.slug === Astro.params.policy)!;
+const others = pillar.policies.filter((p) => p.slug !== policy.slug).slice(0, 3);
+---
+
+<Base title={`${policy.title} – ${pillar.title}`} description={policy.excerpt} image={policy.cover?.url}>
+  <div class="container page">
+    <Crumbs items={[{ label: 'Program', href: '/program/' }, { label: pillar.title, href: `/program/${pillar.slug}/` }, { label: policy.title }]} />
+
+    <div class="page-layout">
+      <article>
+        <header>
+          <p class="meta"><a class="tag" href={`/program/${pillar.slug}/`}>{pillar.tag}</a></p>
+          <h1 class="page-title">{policy.title}</h1>
+        </header>
+
+        {
+          policy.cover && (
+            <Image
+              class="cover"
+              src={policy.cover.url}
+              alt={policy.cover.alt}
+              width={policy.cover.width ?? 1600}
+              height={policy.cover.height ?? 900}
+              widths={[830, 1660]}
+              sizes="(min-width: 62em) 830px, 100vw"
+              loading="eager"
+            />
+          )
+        }
+
+        <div class="prose body" set:html={policy.contentHtml} />
+
+        <ShareBar title={policy.title} label="Sdílet návrh" />
+      </article>
+
+      {
+        others.length > 0 && (
+          <aside class="page-aside" aria-labelledby="others-title">
+            <div class="page-aside__inner">
+              <h2 id="others-title">Další návrhy – {pillar.title}</h2>
+              <ul class="others">
+                {others.map((p) => (
+                  <li>
+                    <PolicyCard policy={p} pillarSlug={pillar.slug} compact />
+                  </li>
+                ))}
+              </ul>
+              <a class="link-arrow link-arrow--muted" href={`/program/${pillar.slug}/`}>
+                Všechny návrhy pilíře <Icon name="ArrowRight" />
+              </a>
+            </div>
+          </aside>
+        )
+      }
+    </div>
+  </div>
+
+  <DonateCta />
+</Base>
+
+<style>
+  .tag:hover {
+    text-decoration: none;
+  }
+  article :global(.cover) {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 36px;
+    border-radius: 12px;
+  }
+  .body {
+    margin-top: 36px;
+  }
+  .others {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0 0 24px;
+    padding: 0;
+    list-style: none;
+  }
+</style>

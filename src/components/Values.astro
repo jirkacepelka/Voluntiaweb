@@ -1,0 +1,62 @@
+---
+// Hodnoty 1:1 podle IS (.values + .feature).
+import Icon from './Icon.astro';
+import { values } from '../data/values';
+
+interface Props {
+  /** Nadpis „Hodnoty“ – vypnout, když ho stránka už má ve vlastním titulku. */
+  heading?: boolean;
+}
+
+const { heading = true } = Astro.props;
+---
+
+<section class="section" id="hodnoty">
+  <div class="container">
+    {heading && <h2 class="display">Hodnoty</h2>}
+    <div class:list={['values', { 'values--bare': !heading }]}>
+      {
+        values.map((v) => (
+          <div class="feature">
+            <span class="feature__icon">
+              {v.icon === 'europe' ? (
+                <img src="/evropa.svg" alt="" class="feature__img" width="55" height="64" />
+              ) : v.icon === 'nato' ? (
+                <svg class="ico" width="1em" height="1em" viewBox="244 115 383 383" fill="currentColor" aria-hidden="true">
+                  <path d="M626.3 306.9H435L469.5 270.9L439.3 135.4C439.3 133.9 440.7 133.9 440.7 135.4L481 262.2L626.3 306.9Z M580.2 281C570.2 220.4 522.7 171.4 460.8 159.9L465.2 171.4C517 182.9 558.7 224.7 570.2 278.1L580.2 281Z M435 497.2V306.9L469.5 340.1L606.1 311.2C606.1 311.2 607.6 312.7 606.1 312.7L478.1 353L435 497.2Z M459.4 452.5C521.3 442.4 570.2 393.4 580.2 332.9L568.7 337.2C557.2 389.1 515.5 430.9 463.7 441L459.4 452.5Z M243.6 306.9H435L400.4 341.5L430.6 477C430.6 478.5 429.2 478.5 429.2 477L388.9 350.2L243.6 306.9Z M289.7 331.4C299.7 392 347.2 441 409.1 452.5L404.7 441C353 429.4 311.2 387.6 299.7 334.3L289.7 331.4Z M435 115.2V306.9L400.4 272.3L263.8 301.1C263.8 301.1 262.3 299.7 263.8 299.7L391.8 259.3L435 115.2Z M410.5 159.9C348.6 170 299.7 219 289.7 279.5L301.2 275.2C312.7 223.3 354.4 181.5 406.2 171.4L410.5 159.9Z" />
+                </svg>
+              ) : (
+                <Icon name={v.icon} />
+              )}
+            </span>
+            <h3>{v.title}</h3>
+            <p>{v.text}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .values {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-top: 45px;
+  }
+  .values--bare {
+    margin-top: 0;
+  }
+  @media (min-width: 40em) {
+    .values {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 36px 24px;
+    }
+  }
+  @media (min-width: 72em) {
+    .values {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

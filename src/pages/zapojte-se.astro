@@ -1,0 +1,248 @@
+---
+// Rozcestník „Zapojte se“: čtyři role vedle sebe. Inspirované IS (štítek s cenou, výhody
+// s ikonami, žlutý odkaz se šipkou), texty zkrácené z popisů rolí v IS.
+// Kandidát zatím nemá vlastní přihlášku („Připravujeme“).
+import Base from '../layouts/Base.astro';
+import Crumbs from '../components/Crumbs.astro';
+import Icon from '../components/Icon.astro';
+import { contact, links } from '../config';
+
+type IconName = 'Key' | 'Ear' | 'UserPlus' | 'Megaphone' | 'Newspaper' | 'BicepsFlexed' | 'Users' | 'AudioLines' | 'Phone' | 'LogIn';
+
+interface Role {
+  id: string;
+  icon: 'HandHeart' | 'HandHelping' | 'Vote' | 'HandCoins';
+  title: string;
+  badge: string;
+  soon?: boolean;
+  lead: string;
+  features: { icon: IconName; title: string; text: string }[];
+  cta: { label: string; href: string };
+}
+
+const roles: Role[] = [
+  {
+    id: 'priznivec',
+    icon: 'HandHeart',
+    title: 'Příznivec',
+    badge: '100 Kč/měsíc',
+    lead: 'Pro ty, kdo chtějí být u dění a podporovat stranu, aniž by přebírali formální odpovědnost člena.',
+    features: [
+      { icon: 'Key', title: 'Přístup do strany', text: 'Diskusní kanály, aktivity i konkláve.' },
+      { icon: 'Ear', title: 'Informace', text: 'Pravidelné zprávy o dění ve straně.' },
+      { icon: 'UserPlus', title: 'Cesta ke členství', text: 'Po roce můžete požádat o řádné členství.' },
+    ],
+    cta: { label: 'Stát se příznivcem', href: links.supporter },
+  },
+  {
+    id: 'dobrovolnik',
+    icon: 'HandHelping',
+    title: 'Dobrovolník',
+    badge: 'Zdarma',
+    lead: 'Pro ty, kdo chtějí přispět svým časem a energií – v terénu i on-line.',
+    features: [
+      { icon: 'Megaphone', title: 'Kampaně a akce', text: 'Příprava a realizace politických i komunitních aktivit.' },
+      { icon: 'Newspaper', title: 'Materiály', text: 'Samolepky, plakáty a další propagace.' },
+      { icon: 'BicepsFlexed', title: 'Zkušenosti', text: 'Politický marketing, organizace, grassroots.' },
+    ],
+    cta: { label: 'Stát se dobrovolníkem', href: links.volunteer },
+  },
+  {
+    id: 'kandidat',
+    icon: 'Vote',
+    title: 'Kandidát',
+    badge: 'Připravujeme',
+    soon: true,
+    lead: 'Pro ty, kdo jsou ochotní jít na kandidátku. Ozveme se vám před volbami, když nám budou chybět kandidáti.',
+    features: [
+      { icon: 'Phone', title: 'Kontakt před volbami', text: 'Oslovíme vás při sestavování kandidátek.' },
+      { icon: 'LogIn', title: 'Přístup do IS', text: 'Na kandidátku se můžete zapsat i sami.' },
+    ],
+    cta: { label: 'Napsat nám', href: `mailto:${contact.email}` },
+  },
+  {
+    id: 'prispevatel',
+    icon: 'HandCoins',
+    title: 'Přispěvatel',
+    badge: '50–200 Kč/měsíc',
+    lead: 'Pro ty, kdo chtějí pravidelně finančně podpořit dlouhodobý rozvoj Voluntie.',
+    features: [
+      { icon: 'Ear', title: 'Přehled o penězích', text: 'Víte, na co byly příspěvky použity.' },
+      { icon: 'Users', title: 'Komunita', text: 'Veřejná role na stranickém Discordu.' },
+      { icon: 'AudioLines', title: 'Diskuse', text: 'O programu i o financovaných projektech.' },
+    ],
+    cta: { label: 'Stát se přispěvatelem', href: links.contributor },
+  },
+];
+---
+
+<Base title="Zapojte se" description="Jak se zapojit do Libertariánské strany Voluntia: příznivec, dobrovolník, kandidát nebo přispěvatel.">
+  <div class="container page">
+    <Crumbs items={[{ label: 'Úvod', href: '/' }, { label: 'Zapojte se' }]} />
+    <h1 class="page-title">Zapojte se</h1>
+    <p class="lede">Pomozte nám bránit sociální a ekonomickou svobodu v ČR. Vyberte si, jak chcete být u toho.</p>
+
+    <ul class="roles">
+      {
+        roles.map((r) => (
+          <li class:list={['role', { 'role--soon': r.soon }]} id={r.id}>
+            <div class="role__head">
+              <Icon name={r.icon} size={32} class="role__icon" />
+              <span class="role__badge">{r.badge}</span>
+            </div>
+            <h2>{r.title}</h2>
+            <p class="role__lead">{r.lead}</p>
+            <ul class="role__features">
+              {r.features.map((f) => (
+                <li>
+                  <Icon name={f.icon} size={20} class="role__ficon" />
+                  <span>
+                    <strong>{f.title}</strong>
+                    {f.text}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <a class="role__cta" href={r.cta.href}>
+              {r.cta.label} <Icon name="ArrowRight" size={18} />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="community">
+      Chcete se nejdřív rozhlédnout? Přijďte do komunity na <a href={links.discord}>Discordu</a>,
+      nebo si přečtěte náš <a href={links.program}>program</a>.
+    </p>
+  </div>
+</Base>
+
+<style>
+  .roles {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin: 48px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 48em) {
+    .roles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+  }
+
+  .role {
+    display: flex;
+    flex-direction: column;
+    padding: 28px 28px 26px;
+    border-radius: 12px;
+    background: var(--card);
+    scroll-margin-top: calc(var(--header-h) + 24px);
+  }
+  .role__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .role :global(.role__icon) {
+    color: var(--yellow);
+  }
+  /* Štítek s cenou – jako v IS. */
+  .role__badge {
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 10px;
+    border-radius: var(--radius-sm);
+    background: var(--yellow);
+    color: var(--black);
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .role h2 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+  }
+  .role__lead {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .role__features {
+    display: grid;
+    gap: 14px;
+    margin: 22px 0 0;
+    padding: 20px 0 0;
+    border-top: 1px solid var(--border);
+    list-style: none;
+  }
+  .role__features li {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+    font-size: var(--fs-small);
+    line-height: 1.45;
+    color: var(--muted);
+  }
+  .role__features :global(.role__ficon) {
+    margin-top: 1px;
+    color: var(--yellow);
+  }
+  .role__features strong {
+    display: block;
+    color: var(--white);
+    font-weight: 700;
+  }
+
+  .role__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    margin-top: auto;
+    padding-top: 26px;
+    color: var(--yellow);
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .role__cta:hover {
+    text-decoration: none;
+  }
+  .role__cta :global(svg) {
+    transition: transform var(--dur) var(--ease);
+  }
+  .role__cta:hover :global(svg) {
+    transform: translateX(3px);
+  }
+
+  /* Kandidát zatím bez přihlášky – tlumeně. */
+  .role--soon .role__badge {
+    background: var(--field);
+    color: var(--muted);
+  }
+  .role--soon :global(.role__icon) {
+    color: var(--dim);
+  }
+
+  .community {
+    margin: 36px 0 0;
+    color: var(--muted);
+  }
+  .community a {
+    color: var(--white);
+    text-decoration: underline;
+    text-decoration-color: var(--yellow);
+    text-underline-offset: 3px;
+  }
+</style>

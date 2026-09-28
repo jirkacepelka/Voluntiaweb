@@ -1,0 +1,102 @@
+---
+// Hodnoty (stejné jako v IS) a odkaz na stanovy.
+import Base from '../layouts/Base.astro';
+import Crumbs from '../components/Crumbs.astro';
+import DonateCta from '../components/DonateCta.astro';
+import Icon from '../components/Icon.astro';
+import Values from '../components/Values.astro';
+import { links } from '../config';
+
+const hasStatutes = links.statutes !== '#';
+---
+
+<Base title="Stanovy a hodnoty" description="Hodnoty a stanovy Libertariánské strany Voluntia.">
+  <div class="container page head">
+    <Crumbs items={[{ label: 'Úvod', href: '/' }, { label: 'Stanovy a hodnoty' }]} />
+    <h1 class="page-title">Stanovy a hodnoty</h1>
+    <p class="lede">
+      Nejvyšší hodnotou je pro nás dobrovolnost – základní kámen svobodné, respektující a produktivní společnosti.
+    </p>
+  </div>
+
+  <Values heading={false} />
+
+  <section class="section statutes" aria-labelledby="statutes-title">
+    <div class="container">
+      <div class="statutes__box">
+        <Icon name="ScrollText" size={40} class="statutes__icon" />
+        <div class="statutes__text">
+          <h2 id="statutes-title">Stanovy strany</h2>
+          <p>Stanovy upravují fungování strany, práva a povinnosti členů a její orgány.</p>
+        </div>
+        {
+          hasStatutes ? (
+            <a class="btn btn--light" href={links.statutes}>
+              Přečíst stanovy <Icon name="ArrowRight" size={18} />
+            </a>
+          ) : (
+            <span class="soon">Stanovy brzy zveřejníme</span>
+          )
+        }
+      </div>
+      <p class="more">
+        Podrobněji o straně: <a href={links.about}>O nás</a> · <a href={links.manifest}>Manifest</a> · <a href={links.program}>Program</a>
+      </p>
+    </div>
+  </section>
+
+  <DonateCta />
+</Base>
+
+<style>
+  .head {
+    padding-bottom: 0;
+  }
+  .head .lede {
+    max-width: 760px;
+  }
+  .statutes {
+    padding-top: 0;
+  }
+  .statutes__box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px 24px;
+    padding: 28px;
+    border-radius: 12px;
+    background: var(--card);
+  }
+  .statutes__box :global(.statutes__icon) {
+    color: var(--yellow);
+  }
+  .statutes__text {
+    flex: 1;
+    min-width: 240px;
+  }
+  .statutes__text h2 {
+    margin: 0 0 6px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+  }
+  .statutes__text p {
+    margin: 0;
+    color: var(--muted);
+  }
+  .soon {
+    font-size: var(--fs-note);
+    color: var(--dim);
+  }
+  .more {
+    margin: 20px 0 0;
+    font-size: var(--fs-note);
+    color: var(--muted);
+  }
+  .more a {
+    color: var(--white);
+    text-decoration: underline;
+    text-decoration-color: var(--yellow);
+    text-underline-offset: 3px;
+  }
+</style>

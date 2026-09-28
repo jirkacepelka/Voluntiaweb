@@ -1,0 +1,97 @@
+---
+import ContentPage from '../layouts/ContentPage.astro';
+import ContactInfo from '../components/ContactInfo.astro';
+import Icon from '../components/Icon.astro';
+import { parse } from 'node-html-parser';
+import { cms } from '../lib/cms';
+import { removeHeadingAndNextBlock, removeSectionByHeading } from '../lib/cms/html';
+import { links, organs } from '../config';
+import { values } from '../data/values';
+
+const page = await cms.getPage('o-nas');
+if (!page) throw new Error('Stránku „o-nas“ se nepodařilo načíst z CMS.');
+// Části, které web vykresluje sám, z obsahu z CMS vynecháme:
+// výzvu „Zapojte se“ (pod stránkou je blok Pomozte Voluntii), transparentní účty (má vlastní
+// stránku, odkaz je vpravo) a tlačítko „Kontakt“ (kontakty jsou hned pod textem).
+let contentHtml = removeSectionByHeading(page.contentHtml, 'Zapojte se');
+contentHtml = removeHeadingAndNextBlock(contentHtml, 'Transparentní účty');
+contentHtml = contentHtml.replace(/<a[^>]*href="\/o-nas\/#kontakt"[^>]*>[\s\S]*?<\/a>/g, '');
+
+// Věta o konsensuálním rozhodování u orgánů strany se na novém webu nezobrazuje.
+contentHtml = contentHtml.replace(/<p[^>]*>\s*Rozhodování ve straně je prováděno konsensuálně[\s\S]*?<\/p>/, '');
+
+// Orgány strany: název orgánu odkazuje na jeho stránku v IS.
+for (const [name, href] of Object.entries(organs)) {
+  contentHtml = contentHtml.replace(`<strong>${name}</strong>`, `<strong><a href="${href}">${name}</a></strong>`);
+}
+
+// „Nejvýznamnější hodnoty strany“ → hodnoty z IS (stejné jako na úvodní stránce), jako textový
+// seznam ve stejném stylu jako ostatní seznamy na stránce.
+contentHtml = replaceValues(contentHtml);
+
+function replaceValues(html: string): string {
+  const root = parse(html, { comment: false });
+  const h = root.querySelectorAll('h2').find((el) => /hodnoty strany/i.test(el.textContent));
+  if (!h) return html;
+  h.set_content('Hodnoty');
+  // Blok nadpisu (obal z Elementoru) a hned za ním blok se seznamem.
+  let block = h;
+  while (block.parentNode && block.parentNode.childNodes.filter((n) => n.nodeType === 1).length === 1) block = block.parentNode;
+  const list = `<ol>${values.map((v) => `<li><strong>${escape(v.title)}</strong> – ${escape(v.text)}</li>`).join('')}</ol>`;
+  const next = block.nextElementSibling;
+  if (next?.querySelector('ol, ul')) next.replaceWith(list);
+  else block.insertAdjacentHTML('afterend', list);
+  return root.toString();
+}
+
+function escape(s: string) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+---
+
+<ContentPage title={page.title} metaTitle="O nás" crumbs={[{ label: 'Úvod', href: '/' }, { label: 'O nás' }]}>
+  <div class="prose" set:html={contentHtml} />
+  <ContactInfo />
+
+  <div slot="aside" class="more">
+    <h2>Více o Voluntii</h2>
+    <ul>
+      <li><a href={links.manifest}>Manifest <Icon name="ArrowRight" size={18} /></a></li>
+      <li><a href={links.program}>Program <Icon name="ArrowRight" size={18} /></a></li>
+      <li><a href={links.values}>Stanovy a hodnoty <Icon name="ArrowRight" size={18} /></a></li>
+      <li><a href={links.people}>Lidé <Icon name="ArrowUpRight" size={18} /></a></li>
+      <li><a href={links.transparency}>Transparentnost <Icon name="ArrowRight" size={18} /></a></li>
+      <li><a href={links.press}>Pro média <Icon name="ArrowRight" size={18} /></a></li>
+      <li><a href="#kontakt">Kontakt <Icon name="ArrowDown" size={18} /></a></li>
+    </ul>
+  </div>
+</ContentPage>
+
+<style>
+  .more ul {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .more a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: var(--card);
+    color: var(--white);
+    font-weight: 600;
+    transition: background-color var(--dur) var(--ease);
+  }
+  .more a:hover {
+    background: var(--card-hover);
+    text-decoration: none;
+  }
+  .more a :global(svg) {
+    color: var(--dim);
+  }
+</style>

@@ -1,0 +1,21 @@
+---
+// Drobečková navigace. Poslední položka (aktuální stránka) je bez odkazu.
+import Icon from './Icon.astro';
+
+interface Props {
+  items: { label: string; href?: string }[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="crumbs" aria-label="Drobečková navigace">
+  {
+    items.map((item, i) => (
+      <>
+        {i > 0 && <Icon name="ChevronRight" size={14} />}
+        {item.href ? <a href={item.href}>{item.label}</a> : <span aria-current="page">{item.label}</span>}
+      </>
+    ))
+  }
+</nav>

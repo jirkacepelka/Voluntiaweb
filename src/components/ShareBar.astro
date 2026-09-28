@@ -1,0 +1,74 @@
+---
+// Řádek „Sdílet“ pod textem: Facebook, X a zkopírování odkazu.
+import Icon from './Icon.astro';
+
+interface Props {
+  title: string;
+  label?: string;
+}
+
+const { title, label = 'Sdílet' } = Astro.props;
+const pageUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const share = [
+  { label: 'Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}` },
+  { label: 'X', href: `https://x.com/intent/post?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(title)}` },
+];
+---
+
+<footer class="share">
+  <span class="share__label">{label}</span>
+  <div class="share__buttons">
+    {
+      share.map((s) => (
+        <a class="btn btn--ghost share__btn" href={s.href}>
+          {s.label}
+        </a>
+      ))
+    }
+    <button class="btn btn--ghost share__btn" type="button" data-copy={pageUrl}>
+      <Icon name="Link" size={16} /> <span data-copy-label>Kopírovat odkaz</span>
+    </button>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) => {
+    const label = btn.querySelector('[data-copy-label]');
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy ?? location.href);
+        if (label) label.textContent = 'Zkopírováno';
+      } catch {
+        if (label) label.textContent = 'Nepodařilo se zkopírovat';
+      }
+      setTimeout(() => label && (label.textContent = 'Kopírovat odkaz'), 2000);
+    });
+  });
+</script>
+
+<style>
+  .share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .share__label {
+    font-size: var(--fs-note);
+    color: var(--muted);
+  }
+  .share__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .share__btn {
+    height: var(--tab-h);
+    padding: 0 16px;
+    font-size: var(--fs-note);
+  }
+</style>

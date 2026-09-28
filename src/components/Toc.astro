@@ -1,0 +1,95 @@
+---
+// Obsah stránky (kapitoly) do pravého sloupce. Aktuální kapitola se při scrollování zvýrazní.
+import type { Heading } from '../lib/cms/html';
+
+interface Props {
+  headings: Heading[];
+  title?: string;
+}
+
+const { headings, title = 'Kapitoly' } = Astro.props;
+---
+
+<nav class="toc" aria-labelledby="toc-title">
+  <h2 id="toc-title">{title}</h2>
+  <ol>
+    {
+      headings.map((h, i) => (
+        <li>
+          <a href={`#${h.id}`} data-toc-link={h.id}>
+            <span class="toc__num">{String(i + 1).padStart(2, '0')}</span>
+            {h.text}
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<script>
+  const links = new Map(
+    [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')].map((a) => [a.dataset.tocLink!, a]),
+  );
+  const targets = [...links.keys()].map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
+  const setActive = (id: string) => links.forEach((a, key) => a.toggleAttribute('aria-current', key === id));
+
+  if (targets.length) {
+    // Aktivní je poslední kapitola, jejíž nadpis už přejel horní třetinu okna.
+    const update = () => {
+      const line = window.innerHeight * 0.3;
+      let current = targets[0].id;
+      for (const t of targets) if (t.getBoundingClientRect().top <= line) current = t.id;
+      setActive(current);
+    };
+    let frame = 0;
+    window.addEventListener('scroll', () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    }, { passive: true });
+    update();
+  }
+</script>
+
+<style>
+  .toc h2 {
+    margin: 0 0 14px;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+  }
+  ol {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  a {
+    display: flex;
+    gap: 12px;
+    padding: 7px 12px;
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    line-height: 1.35;
+    transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+  a:hover {
+    color: var(--white);
+    text-decoration: none;
+  }
+  a[aria-current] {
+    background: var(--card);
+    color: var(--white);
+  }
+  .toc__num {
+    flex: none;
+    color: var(--dim);
+    font-variant-numeric: tabular-nums;
+  }
+  a[aria-current] .toc__num {
+    color: var(--yellow);
+  }
+</style>

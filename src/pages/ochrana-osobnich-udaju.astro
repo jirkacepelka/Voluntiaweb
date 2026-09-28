@@ -1,0 +1,11 @@
+---
+import ContentPage from '../layouts/ContentPage.astro';
+import { cms } from '../lib/cms';
+
+const page = await cms.getPage('ochrana-osobnich-udaju');
+if (!page) throw new Error('Stránku „ochrana-osobnich-udaju“ se nepodařilo načíst z CMS.');
+---
+
+<ContentPage title="Ochrana osobních údajů" donate={false}>
+  <div class="prose" set:html={page.contentHtml} />
+</ContentPage>

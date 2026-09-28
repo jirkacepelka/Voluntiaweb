@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<Base title="Stránka nenalezena">
+  <div class="container page">
+    <h1 class="page-title">Tahle stránka neexistuje.</h1>
+    <p class="lede">Možná byla přesunuta, nebo je v adrese překlep.</p>
+    <p class="actions">
+      <a class="btn btn--light" href="/">Zpět na úvod <Icon name="ArrowRight" size={18} /></a>
+      <a class="btn btn--ghost" href="/clanky/">Články</a>
+    </p>
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding-top: 80px;
+    min-height: 50vh;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 32px 0 0;
+  }
+</style>

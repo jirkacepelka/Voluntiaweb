@@ -1,0 +1,72 @@
+---
+// Karta osoby 1:1 podle IS (.people-grid .person): čtvercová fotka na žlutém, jméno, poznámka.
+import { Image } from 'astro:assets';
+import type { Person } from '../lib/cms';
+import { initials } from '../lib/format';
+
+interface Props {
+  person: Person;
+}
+
+const { person } = Astro.props;
+const Tag = person.url ? 'a' : 'div';
+---
+
+<li class="person">
+  <Tag class="person__link" href={person.url ?? undefined}>
+    {
+      person.photo ? (
+        <span class="thumb person__photo">
+          <Image src={person.photo.url} alt={person.photo.alt || person.name} width={400} height={400} widths={[200, 300, 400]} sizes="(min-width: 62em) 240px, 50vw" />
+        </span>
+      ) : (
+        <span class="thumb thumb--empty person__photo" aria-hidden="true">
+          <span>{initials(person.name)}</span>
+        </span>
+      )
+    }
+    <span class="person__name">{person.name}</span>
+    {person.role && <span class="person__note">{person.role}</span>}
+    {person.bio && <span class="person__note person__note--bio">{person.bio}</span>}
+  </Tag>
+</li>
+
+<style>
+  .person__link {
+    display: block;
+    color: inherit;
+  }
+  .person__link:hover {
+    text-decoration: none;
+  }
+  .person__photo {
+    aspect-ratio: 1 / 1;
+  }
+  /* Bez fotky: tmavá výplň se žlutými iniciálami (klidnější než stěna žlutých ploch). */
+  .person__photo.thumb--empty {
+    background: var(--field);
+    color: var(--yellow);
+  }
+  .person__name {
+    display: block;
+    margin-top: 10px;
+    font-weight: 700;
+    font-size: var(--fs-name);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  a.person__link:hover .person__name {
+    color: var(--yellow);
+  }
+  .person__note {
+    display: block;
+    margin: 0;
+    font-size: var(--fs-note);
+    line-height: 1.21;
+    color: var(--muted);
+  }
+  .person__note--bio {
+    margin-top: 4px;
+    color: var(--dim);
+  }
+</style>

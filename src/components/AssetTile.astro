@@ -1,0 +1,108 @@
+---
+// Dlaždice podkladu ke stažení (stránka Pro média): náhled na odpovídajícím podkladu
+// a odkazy na soubory s velikostí.
+import Icon from './Icon.astro';
+
+interface Props {
+  title: string;
+  preview: string;
+  tone: 'dark' | 'yellow';
+  wide?: boolean;
+  files: { label: string; href: string; size: string }[];
+}
+
+const { title, preview, tone, wide = false, files } = Astro.props;
+---
+
+<li class="asset">
+  <div class:list={['asset__preview', `asset__preview--${tone}`, { 'asset__preview--wide': wide }]}>
+    <img src={preview} alt={title} loading="lazy" />
+  </div>
+  <div class="asset__body">
+    <span class="asset__title">{title}</span>
+    <span class="asset__files">
+      {
+        files.map((f) => (
+          <a href={f.href} download>
+            <Icon name="Download" size={14} />
+            {f.label} <span>{f.size}</span>
+          </a>
+        ))
+      }
+    </span>
+  </div>
+</li>
+
+<style>
+  .asset {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 12px;
+    background: var(--card);
+  }
+  .asset__preview {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    padding: 18% 28%;
+  }
+  .asset__preview--wide {
+    aspect-ratio: 2 / 1;
+    padding: 11% 20%;
+  }
+  .asset__preview--dark {
+    background: #121212;
+    /* Tečkovaná mřížka jako v hero, ať je vidět, že jde o průhledný podklad. */
+    background-image: radial-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+  .asset__preview--yellow {
+    background: var(--yellow);
+  }
+  .asset__preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .asset__body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px 16px;
+  }
+  .asset__title {
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .asset__files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .asset__files a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 9px;
+    border-radius: var(--radius-sm);
+    background: var(--field);
+    color: var(--white);
+    font-size: 13px;
+    font-weight: 600;
+    transition: background-color var(--dur) var(--ease);
+  }
+  .asset__files a:hover {
+    background: var(--field-hover);
+    text-decoration: none;
+  }
+  .asset__files a :global(svg) {
+    color: var(--yellow);
+  }
+  .asset__files span {
+    font-weight: 500;
+    color: var(--muted);
+  }
+</style>

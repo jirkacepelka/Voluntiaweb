@@ -1,0 +1,373 @@
+---
+// Hero: kompozice z Frameru (tečkovaná mřížka, naklopené dlaždice, velké logo),
+// prvky a typografie z IS, tři nízké karty ve stylu statnidluh.
+import Icon from './Icon.astro';
+import SocialIcons from './SocialIcons.astro';
+import VoluntiaMark from './VoluntiaMark.astro';
+import { debt, heroStats, links } from '../config';
+import { formatNumber } from '../lib/format';
+---
+
+<section class="hero">
+  <div class="hero__dots" aria-hidden="true"></div>
+  <VoluntiaMark class="mark mark--yellow" />
+  <VoluntiaMark class="mark mark--grey" />
+
+  <div class="container hero__inner">
+    <div class="hero__intro">
+      <a class="hero__news" href={links.magistrat}>
+        <span class="hero__news-tag">Nově</span>
+        Kandidujeme na pražský magistrát
+        <Icon name="ArrowRight" size={16} />
+      </a>
+      <div class="hero__title">
+        <h1>Voluntia</h1>
+        <p class="hero__claim">více svobody, <span>méně státu</span></p>
+      </div>
+      <div class="hero__actions">
+        <a class="btn btn--primary" href={links.program}>Náš program</a>
+        <a class="btn btn--light" href={links.getInvolved}>Zapojte se</a>
+      </div>
+      <SocialIcons size={32} class="hero__socials" />
+    </div>
+
+    <div class="hero__cards">
+      {
+        heroStats.map((s) => {
+          // Karta bez cílové stránky (href '#') je jen informační, ne odkaz.
+          const Card = s.href && s.href !== '#' ? 'a' : 'div';
+          return (
+          <Card class="qcard" href={Card === 'a' ? s.href : undefined}>
+            <Icon name={s.icon} size={32} class="qcard__icon" />
+            <span class="qcard__body">
+              <span class="qcard__label">
+                {s.label}
+                {s.live && <span class="live">živě</span>}
+              </span>
+              {s.live ? (
+                <>
+                  <span class="qcard__value">
+                    <span data-debt-amount data-amount={debt.amount} data-measured-at={debt.measuredAt} data-per-day={debt.perDay}>
+                      {formatNumber(debt.amount)}
+                    </span>
+                    <span class="unit">{s.unit}</span>
+                  </span>
+                  <span class="qcard__sub qcard__sub--alert">
+                    + <span data-debt-since>0</span> kč {s.sub}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span class:list={['qcard__value', { 'qcard__value--todo': s.value === null }]}>
+                    {s.value ?? 'doplníme'}
+                    {s.value !== null && <span class="unit">{s.unit}</span>}
+                  </span>
+                  <span class="qcard__sub">{s.sub}</span>
+                </>
+              )}
+            </span>
+            {Card === 'a' && <Icon name="ArrowRight" size={22} class="qcard__arrow" />}
+          </Card>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  // Odhad dluhu v tuto chvíli: výchozí částka + denní přírůstek od data měření (princip statnidluh).
+  const amountEl = document.querySelector<HTMLElement>('[data-debt-amount]');
+  const sinceEl = document.querySelector<HTMLElement>('[data-debt-since]');
+  if (amountEl) {
+    const amount = Number(amountEl.dataset.amount);
+    const measuredAt = Date.parse(amountEl.dataset.measuredAt ?? '');
+    const perMs = Number(amountEl.dataset.perDay) / 86_400_000;
+    const openedAt = Date.now();
+    const fmt = new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 0 });
+    const tick = () => {
+      const now = Date.now();
+      amountEl.textContent = fmt.format(amount + (now - measuredAt) * perMs);
+      if (sinceEl) sinceEl.textContent = fmt.format((now - openedAt) * perMs);
+    };
+    tick();
+    // Jednou za sekundu – častější přepis dělá z posledních číslic neklidné blikání.
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(tick, 1000);
+  }
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 72px 0 40px;
+    background: var(--bg);
+  }
+
+  @media (min-width: 48em) {
+    .hero {
+      padding: 120px 0 56px;
+    }
+  }
+
+  /* Tečkovaná mřížka z Frameru, ke krajům mizí. */
+  .hero__dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgb(255 255 255 / 0.09) 1.2px, transparent 1.6px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 35%, #000 30%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* Naklopené značky Voluntie v pozadí (žlutá a šedá, 60% krytí). */
+  .hero :global(.mark) {
+    position: absolute;
+    pointer-events: none;
+    height: auto;
+    opacity: 0.6;
+  }
+  .hero :global(.mark--yellow) {
+    left: -130px;
+    top: 190px;
+    width: 420px;
+    color: var(--yellow);
+    transform: rotate(-10deg);
+  }
+  .hero :global(.mark--grey) {
+    right: -120px;
+    top: 10px;
+    width: 400px;
+    color: #3a3a3a;
+    transform: rotate(12deg);
+  }
+
+  .hero__inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 72px;
+  }
+
+  @media (min-width: 48em) {
+    .hero__inner {
+      gap: 104px;
+    }
+  }
+
+  .hero__intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero__news {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 40px;
+    padding: 5px 14px 5px 5px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--chip);
+    color: var(--text-soft);
+    font-size: var(--fs-note);
+    font-weight: 500;
+    transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+
+  .hero__news:hover {
+    border-color: var(--yellow);
+    color: var(--white);
+    text-decoration: none;
+  }
+
+  .hero__news-tag {
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: var(--yellow);
+    color: var(--black);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* Název a podtitul podle návrhu: název bez zúženého prostrkání, podtitul 0,311× velikosti
+     názvu (vyjde o chlup užší než název) a těsně pod ním – účaří od sebe 0,383× velikosti názvu
+     (= přesah řádku názvu pod účaří + horní část řádku podtitulu + margin-top). */
+  /* Na telefonu vyplní název šířku obrazovky (bez 2× 16px okraje; „Voluntia“ má ~4,03 em),
+     na počítači nejvýš 128 px. */
+  .hero__title {
+    --title-size: clamp(64px, calc((100vw - 32px) / 4.15), 128px);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: var(--title-size);
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: 0;
+  }
+
+  .hero__claim {
+    margin: 0.09em 0 32px;
+    font-size: calc(var(--title-size) * 0.311);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.006em;
+    white-space: nowrap;
+    color: var(--text-soft);
+  }
+
+  .hero__claim span {
+    color: var(--yellow);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .hero__intro :global(.hero__socials) {
+    margin-top: 28px;
+  }
+
+  /* Tři nízké karty – rámeček jako karta IS, obsah jako metrika statnidluh. */
+  .hero__cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  @media (min-width: 62em) {
+    .hero__cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+  }
+
+  .qcard {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background: rgb(18 18 18 / 0.85);
+    backdrop-filter: blur(6px);
+    color: var(--white);
+    transition: border-color var(--dur) var(--ease);
+  }
+
+  a.qcard:hover {
+    border-color: var(--yellow);
+    text-decoration: none;
+  }
+
+  .qcard :global(.qcard__icon) {
+    color: var(--yellow);
+    flex: none;
+  }
+
+  .qcard__body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .qcard__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  .live {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--alert);
+    font-weight: 700;
+  }
+
+  .live::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  /* Klidné „dýchání“, ne blikání. */
+  @keyframes pulse {
+    50% {
+      opacity: 0.45;
+    }
+  }
+
+  .qcard__value {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .qcard__value {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .qcard__value--todo {
+    color: var(--dim);
+    font-style: italic;
+  }
+
+  .unit {
+    margin-left: 0.2em;
+    font-size: 0.6em;
+    color: var(--yellow);
+  }
+
+  .qcard__sub {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .qcard__sub--alert {
+    color: var(--alert);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .qcard :global(.qcard__arrow) {
+    flex: none;
+    color: var(--dim);
+    transition: transform var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+
+  .qcard:hover :global(.qcard__arrow) {
+    color: var(--yellow);
+    transform: translateX(2px);
+  }
+
+  @media (max-width: 47.99em) {
+    .hero :global(.mark--yellow) {
+      width: 230px;
+      left: -150px;
+      top: 170px;
+    }
+    .hero :global(.mark--grey) {
+      width: 220px;
+      right: -95px;
+    }
+  }
+</style>
