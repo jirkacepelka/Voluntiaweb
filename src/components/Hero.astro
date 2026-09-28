@@ -82,10 +82,30 @@ import people from '../assets/hero/lide.png';
         })
       }
     </div>
+    <div class="hero__dotsnav" aria-label="Karty">
+      {heroStats.map((st, i) => <button type="button" aria-label={st.label} aria-current={i === 0 ? 'true' : 'false'} />)}
+    </div>
   </div>
 </section>
 
 <script>
+  // Tečky pod kartami (telefon): zvýrazní právě viditelnou kartu, kliknutím na ni posunou.
+  const track = document.querySelector<HTMLElement>('.hero__cards');
+  const dots = [...document.querySelectorAll<HTMLButtonElement>('.hero__dotsnav button')];
+  if (track && dots.length) {
+    const cards = [...track.children] as HTMLElement[];
+    const offset = (i: number) => cards[i].offsetLeft - cards[0].offsetLeft;
+    const update = () => {
+      // Poslední karta se nedá doscrollovat až k levému okraji, proto konec = poslední.
+      const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+      const step = offset(1) || 1;
+      const current = atEnd ? cards.length - 1 : Math.round(track.scrollLeft / step);
+      dots.forEach((d, j) => d.setAttribute('aria-current', String(current === j)));
+    };
+    track.addEventListener('scroll', update, { passive: true });
+    dots.forEach((d, i) => d.addEventListener('click', () => track.scrollTo({ left: offset(i), behavior: 'smooth' })));
+  }
+
   // Odhad dluhu v tuto chvíli: výchozí částka + denní přírůstek od data měření (princip statnidluh).
   const amountEl = document.querySelector<HTMLElement>('[data-debt-amount]');
   const sinceEl = document.querySelector<HTMLElement>('[data-debt-since]');
@@ -120,13 +140,17 @@ import people from '../assets/hero/lide.png';
     }
   }
 
-  /* Tečkovaná mřížka z Frameru, ke krajům mizí. */
+  /* Tečkovaná mřížka z Frameru, ke krajům mizí – a dole vymizí nad kartami, ve stejném pásu
+     jako spodek fotky lidí. */
   .hero__dots {
     position: absolute;
     inset: 0;
     background-image: radial-gradient(rgb(255 255 255 / 0.09) 1.2px, transparent 1.6px);
     background-size: 22px 22px;
-    mask-image: radial-gradient(ellipse 70% 60% at 50% 35%, #000 30%, transparent 100%);
+    mask-image:
+      radial-gradient(ellipse 70% 60% at 50% 35%, #000 30%, transparent 100%),
+      linear-gradient(#000 55%, transparent 79%);
+    mask-composite: intersect;
     pointer-events: none;
   }
 
@@ -168,8 +192,8 @@ import people from '../assets/hero/lide.png';
   /* Na počítači heslo vlevo, lidé vpravo, karty pod tím přes celou šířku. */
   @media (min-width: 62em) {
     .hero__inner {
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-      column-gap: 56px;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+      column-gap: 32px;
       align-items: center;
     }
     .hero__cards {
@@ -237,53 +261,96 @@ import people from '../assets/hero/lide.png';
   }
 
   /* Skupinová fotka: bez rámečku, usazená dole na kartách. Spodek (fotky končí v pase)
-     přechází do plné barvy pozadí, která zakryje i tečky – lidé z přechodu vyrůstají. */
+     mizí ve stejném pásu jako tečkovaná mřížka – lidé vyrůstají z jejího přechodu.
+     Jen na počítači, na užších obrazovkách by fotka pod textem zabrala celou obrazovku. */
   .hero__people {
-    position: relative;
-    align-self: end;
-    margin: 0 -8px -56px;
+    display: none;
   }
 
-  .hero__people::after {
-    content: '';
-    position: absolute;
-    left: -24px;
-    right: -24px;
-    bottom: 0;
-    height: 42%;
-    background: linear-gradient(rgb(18 18 18 / 0), var(--bg) 88%);
-    pointer-events: none;
+  @media (min-width: 62em) {
+    .hero__people {
+      display: block;
+      position: relative;
+      align-self: end;
+      margin: -40px -24px -96px -8px;
+    }
   }
 
   .hero__people :global(img) {
     display: block;
     width: 100%;
     height: auto;
-  }
-
-  @media (min-width: 48em) {
-    .hero__people {
-      margin-bottom: -96px;
-    }
-  }
-
-  @media (min-width: 62em) {
-    .hero__people {
-      margin-right: -24px;
-    }
+    mask-image: linear-gradient(#000 62%, transparent 100%);
   }
 
   /* Tři nízké karty – rámeček jako karta IS, obsah jako metrika statnidluh. */
+  /* Na telefonu a tabletu se mezi kartami listuje do stran (karta má šířku obsahu stránky,
+     posouvá se až k okraji obrazovky), pozici ukazují tečky pod nimi. */
   .hero__cards {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-auto-flow: column;
+    grid-auto-columns: 100%;
     gap: 12px;
+    margin: 0 calc(-1 * var(--gutter));
+    padding: 0 var(--gutter);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 var(--gutter);
+    scrollbar-width: none;
+  }
+
+  .hero__cards::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hero__cards > :global(*) {
+    scroll-snap-align: start;
+  }
+
+  @media (min-width: 48em) and (max-width: 61.99em) {
+    .hero__cards {
+      grid-auto-columns: 46%;
+    }
+    .hero__dotsnav {
+      margin-top: -80px;
+    }
+  }
+
+  .hero__dotsnav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: -40px;
+  }
+
+  .hero__dotsnav button {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: var(--border);
+    cursor: pointer;
+    transition: width var(--dur) var(--ease), background-color var(--dur) var(--ease);
+  }
+
+  .hero__dotsnav button[aria-current='true'] {
+    width: 22px;
+    background: var(--yellow);
   }
 
   @media (min-width: 62em) {
     .hero__cards {
+      grid-auto-flow: row;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 16px;
+      margin: 0;
+      padding: 0;
+      overflow: visible;
+    }
+    .hero__dotsnav {
+      display: none;
     }
   }
 
@@ -409,4 +476,5 @@ import people from '../assets/hero/lide.png';
       right: -95px;
     }
   }
+
 </style>
