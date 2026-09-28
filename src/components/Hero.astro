@@ -236,21 +236,40 @@ import people from '../assets/hero/lide.png';
     margin-top: 28px;
   }
 
-  /* Skupinová fotka: bez rámečku, spodek (fotky končí v pase) se rozplyne do pozadí. */
+  /* Skupinová fotka: bez rámečku, usazená dole na kartách. Spodek (fotky končí v pase)
+     přechází do plné barvy pozadí, která zakryje i tečky – lidé z přechodu vyrůstají. */
   .hero__people {
-    margin: 0 -8px;
+    position: relative;
+    align-self: end;
+    margin: 0 -8px -56px;
+  }
+
+  .hero__people::after {
+    content: '';
+    position: absolute;
+    left: -24px;
+    right: -24px;
+    bottom: 0;
+    height: 42%;
+    background: linear-gradient(rgb(18 18 18 / 0), var(--bg) 88%);
+    pointer-events: none;
   }
 
   .hero__people :global(img) {
     display: block;
     width: 100%;
     height: auto;
-    mask-image: linear-gradient(#000 72%, transparent 100%);
+  }
+
+  @media (min-width: 48em) {
+    .hero__people {
+      margin-bottom: -96px;
+    }
   }
 
   @media (min-width: 62em) {
     .hero__people {
-      margin: 0 -24px 0 0;
+      margin-right: -24px;
     }
   }
 
