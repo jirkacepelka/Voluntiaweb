@@ -1,14 +1,13 @@
 ---
 // Výzva k podpoře – rozložení z prvního náčrtu: žlutý blok uvnitř stránky,
-// vlevo nadpis, vpravo tři široká tlačítka. Dekorace je značka Voluntie jako v hero.
+// vlevo nadpis, vpravo dvě široká tlačítka. Dekorace je značka Voluntie jako v hero.
 import Icon from './Icon.astro';
 import VoluntiaMark from './VoluntiaMark.astro';
 import { links } from '../config';
 
 const actions = [
-  { label: 'Přispět na provoz strany', href: links.donate, variant: 'dark' },
-  { label: 'Stát se členem', href: links.signupMember, variant: 'light' },
-  { label: 'Zapojit se jako dobrovolník', href: links.volunteer, variant: 'outline' },
+  { label: 'Přispět na kampaň', href: links.donate, variant: 'dark' },
+  { label: 'Zapojte se', href: links.getInvolved, variant: 'light' },
 ];
 ---
 
@@ -179,14 +178,5 @@ const actions = [
   .donate__btn--light:hover {
     background: #f1f1f1;
     border-color: #f1f1f1;
-  }
-
-  .donate__btn--outline {
-    color: var(--black);
-  }
-
-  .donate__btn--outline:hover {
-    background: var(--black);
-    color: var(--white);
   }
 </style>

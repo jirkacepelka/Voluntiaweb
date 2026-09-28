@@ -1,11 +1,13 @@
 ---
-// Hero: kompozice z Frameru (tečkovaná mřížka, naklopené dlaždice, velké logo),
-// prvky a typografie z IS, tři nízké karty ve stylu statnidluh.
+// Hero: vlevo heslo a tlačítka, vpravo skupinová fotka (vyříznutá, průhledné pozadí),
+// pozadí z Frameru (tečkovaná mřížka, naklopené značky), pod tím tři karty ve stylu statnidluh.
+import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import SocialIcons from './SocialIcons.astro';
 import VoluntiaMark from './VoluntiaMark.astro';
 import { debt, heroStats, links } from '../config';
 import { formatNumber } from '../lib/format';
+import people from '../assets/hero/lide.png';
 ---
 
 <section class="hero">
@@ -20,15 +22,23 @@ import { formatNumber } from '../lib/format';
         Kandidujeme na pražský magistrát
         <Icon name="ArrowRight" size={16} />
       </a>
-      <div class="hero__title">
-        <h1>Voluntia</h1>
-        <p class="hero__claim">více svobody, <span>méně státu</span></p>
-      </div>
+      <h1 class="hero__title">Méně státu, <span>více svobody</span></h1>
       <div class="hero__actions">
         <a class="btn btn--primary" href={links.program}>Náš program</a>
         <a class="btn btn--light" href={links.getInvolved}>Zapojte se</a>
       </div>
       <SocialIcons size={32} class="hero__socials" />
+    </div>
+
+    <div class="hero__people">
+      <Image
+        src={people}
+        alt="Tři představitelé Voluntie"
+        widths={[640, 960, 1280]}
+        sizes="(min-width: 62em) 560px, 100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
     </div>
 
     <div class="hero__cards">
@@ -128,8 +138,8 @@ import { formatNumber } from '../lib/format';
     opacity: 0.6;
   }
   .hero :global(.mark--yellow) {
-    left: -130px;
-    top: 190px;
+    left: -250px;
+    bottom: 40px;
     width: 420px;
     color: var(--yellow);
     transform: rotate(-10deg);
@@ -144,22 +154,33 @@ import { formatNumber } from '../lib/format';
 
   .hero__inner {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 72px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 56px;
   }
 
   @media (min-width: 48em) {
     .hero__inner {
-      gap: 104px;
+      row-gap: 96px;
+    }
+  }
+
+  /* Na počítači heslo vlevo, lidé vpravo, karty pod tím přes celou šířku. */
+  @media (min-width: 62em) {
+    .hero__inner {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      column-gap: 56px;
+      align-items: center;
+    }
+    .hero__cards {
+      grid-column: 1 / -1;
     }
   }
 
   .hero__intro {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    align-items: flex-start;
   }
 
   .hero__news {
@@ -192,46 +213,45 @@ import { formatNumber } from '../lib/format';
     font-weight: 700;
   }
 
-  /* Název a podtitul podle návrhu: název bez zúženého prostrkání, podtitul 0,311× velikosti
-     názvu (vyjde o chlup užší než název) a těsně pod ním – účaří od sebe 0,383× velikosti názvu
-     (= přesah řádku názvu pod účaří + horní část řádku podtitulu + margin-top). */
-  /* Na telefonu vyplní název šířku obrazovky (bez 2× 16px okraje; „Voluntia“ má ~4,03 em),
-     na počítači nejvýš 128 px. */
   .hero__title {
-    --title-size: clamp(64px, calc((100vw - 32px) / 4.15), 128px);
-  }
-
-  h1 {
-    margin: 0;
-    font-size: var(--title-size);
+    margin: 0 0 36px;
+    font-size: clamp(48px, 6.4vw, 88px);
     font-weight: 800;
-    line-height: 0.9;
-    letter-spacing: 0;
+    line-height: 0.98;
+    letter-spacing: -0.035em;
   }
 
-  .hero__claim {
-    margin: 0.09em 0 32px;
-    font-size: calc(var(--title-size) * 0.311);
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: -0.006em;
-    white-space: nowrap;
-    color: var(--text-soft);
-  }
-
-  .hero__claim span {
+  .hero__title span {
+    display: block;
     color: var(--yellow);
   }
 
   .hero__actions {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 12px;
   }
 
   .hero__intro :global(.hero__socials) {
     margin-top: 28px;
+  }
+
+  /* Skupinová fotka: bez rámečku, spodek (fotky končí v pase) se rozplyne do pozadí. */
+  .hero__people {
+    margin: 0 -8px;
+  }
+
+  .hero__people :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    mask-image: linear-gradient(#000 72%, transparent 100%);
+  }
+
+  @media (min-width: 62em) {
+    .hero__people {
+      margin: 0 -24px 0 0;
+    }
   }
 
   /* Tři nízké karty – rámeček jako karta IS, obsah jako metrika statnidluh. */
@@ -363,7 +383,7 @@ import { formatNumber } from '../lib/format';
     .hero :global(.mark--yellow) {
       width: 230px;
       left: -150px;
-      top: 170px;
+      bottom: 380px;
     }
     .hero :global(.mark--grey) {
       width: 220px;

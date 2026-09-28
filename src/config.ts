@@ -112,13 +112,13 @@ export const pages = {
 export const existing = (items: NavLink[]) => items.filter((i) => i.href !== '#');
 
 /** Hlavní položky horní lišty. */
-export const nav: NavLink[] = [pages.values, pages.program, pages.people, { label: 'Členství', href: links.join }, { label: 'Zapojte se', href: links.getInvolved }];
+export const nav: NavLink[] = [pages.values, pages.program, pages.people, { label: 'Zapojte se', href: links.getInvolved }];
 
 /** Rozbalovací menu „Více“ – tři sloupce jako v návrhu ve Frameru. */
 export const navMore: { title: string; items: NavLink[] }[] = [
   { title: 'O Voluntii', items: [pages.about, pages.manifest, pages.people, pages.transparency, pages.press, pages.contact] },
   { title: 'Komunita', items: [pages.news, pages.events, pages.discord, pages.forum, pages.beer] },
-  { title: 'Jak se zapojit?', items: [pages.supporter, pages.volunteer, pages.join, pages.donate, pages.getInvolved] },
+  { title: 'Jak se zapojit?', items: [pages.supporter, pages.volunteer, pages.donate, pages.getInvolved] },
 ].map((g) => ({ ...g, items: existing(g.items) }));
 
 /**

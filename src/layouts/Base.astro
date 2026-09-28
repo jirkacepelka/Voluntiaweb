@@ -13,10 +13,10 @@ interface Props {
 
 const {
   title,
-  description = 'Libertariánská strana Voluntia – více svobody, méně státu.',
+  description = 'Libertariánská strana Voluntia – méně státu, více svobody.',
   image,
 } = Astro.props;
-const fullTitle = title ? `${title} — Voluntia` : 'Voluntia — více svobody, méně státu';
+const fullTitle = title ? `${title} — Voluntia` : 'Voluntia — méně státu, více svobody';
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
