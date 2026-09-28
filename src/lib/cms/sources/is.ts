@@ -16,7 +16,7 @@ import type {
 
 // Klient pro API informačního systému is.voluntia.cz. Kontrakt je popsaný v docs/is-api.md.
 
-const base = (import.meta.env.IS_API_URL ?? 'https://is.voluntia.cz/api/web').replace(/\/$/, '');
+const base = (import.meta.env.IS_API_URL || 'https://is.voluntia.cz/api/web').replace(/\/$/, '');
 const token = import.meta.env.IS_API_TOKEN;
 const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 

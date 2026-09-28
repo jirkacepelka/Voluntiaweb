@@ -6,6 +6,9 @@ import type { Article, ArticleSource, EventSource, PageSource, PeopleSource, Pro
 export type * from './types';
 
 function pick<T>(sources: Record<string, T>, name: string | undefined, envVar: string): T {
+  // Prázdná hodnota nejspíš přišla z nastavení hostingu (Vercel ji má přednost před .env.production),
+  // tiše stavět z ukázkových dat by ale bylo horší než spadnout.
+  if (name === '') throw new Error(`${envVar} je prázdná – vyplňte ji, nebo ji smažte a použije se .env.production`);
   const key = name ?? 'mock';
   const source = sources[key];
   if (!source) throw new Error(`${envVar}="${key}" není podporovaný zdroj (${Object.keys(sources).join(', ')})`);

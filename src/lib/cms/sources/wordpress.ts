@@ -6,7 +6,7 @@ import type { Article, ArticleSource, CmsImage, Page, PageSource, Policy, Progra
 // Přechodný zdroj: obsah ze současného WordPressu na voluntia.cz přes jeho REST API.
 // Obsah z Elementoru se čistí (src/lib/cms/html.ts) a odkazy na staré adresy se přepisují.
 
-const base = (import.meta.env.WP_API_URL ?? 'https://voluntia.cz/wp-json/wp/v2').replace(/\/$/, '');
+const base = (import.meta.env.WP_API_URL || 'https://voluntia.cz/wp-json/wp/v2').replace(/\/$/, '');
 
 /** Adresy stránek na novém webu, které mají ve WordPressu jiný slug. */
 const WP_PAGE_SLUGS: Record<string, string> = {
