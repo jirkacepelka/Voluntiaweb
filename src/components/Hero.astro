@@ -255,10 +255,17 @@ import people from '../assets/hero/lide.png';
 
   .hero__title {
     margin: 0 0 36px;
-    font-size: clamp(48px, 6.4vw, 88px);
+    /* Na telefonu vyplní „více svobody“ (≈ 6,2 em) šířku obsahu, na počítači podle šířky okna. */
+    font-size: clamp(40px, calc((100vw - 2 * var(--gutter)) / 6.3), 88px);
     font-weight: 800;
     line-height: 0.98;
     letter-spacing: -0.035em;
+  }
+
+  @media (min-width: 62em) {
+    .hero__title {
+      font-size: clamp(48px, 6.4vw, 88px);
+    }
   }
 
   .hero__title span {
