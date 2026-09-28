@@ -201,10 +201,26 @@ import people from '../assets/hero/lide.png';
     }
   }
 
+  /* Na telefonu a tabletu (bez fotky) na střed, na počítači vlevo vedle fotky. */
   .hero__intro {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero__actions {
+    justify-content: center;
+  }
+
+  @media (min-width: 62em) {
+    .hero__intro {
+      align-items: flex-start;
+      text-align: left;
+    }
+    .hero__actions {
+      justify-content: flex-start;
+    }
   }
 
   .hero__news {
