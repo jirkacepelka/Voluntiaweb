@@ -579,6 +579,7 @@ p:last-child {
 .underline {
   background: linear-gradient(var(--yellow), var(--yellow)) no-repeat left bottom / 0% 2px;
   padding-bottom: 3px;
+  font-weight: 800;
   transition: background-size 380ms var(--ease);
 }
 
