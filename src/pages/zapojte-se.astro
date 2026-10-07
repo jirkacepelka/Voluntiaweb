@@ -122,24 +122,24 @@ const roles: Role[] = [
   .roles {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 20px;
-    margin: 48px 0 0;
+    gap: 64px;
+    margin: 64px 0 0;
     padding: 0;
     list-style: none;
   }
   @media (min-width: 48em) {
     .roles {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 24px;
+      gap: 80px 72px;
     }
   }
 
+  /* Bez karet – jen tenká linka nahoře, ať text může dýchat. */
   .role {
     display: flex;
     flex-direction: column;
-    padding: 28px 28px 26px;
-    border-radius: 12px;
-    background: var(--card);
+    padding: 32px 0 0;
+    border-top: 1px solid var(--border);
     scroll-margin-top: calc(var(--header-h) + 24px);
   }
   .role__head {
@@ -147,7 +147,7 @@ const roles: Role[] = [
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 28px;
   }
   .role :global(.role__icon) {
     color: var(--yellow);
@@ -166,7 +166,7 @@ const roles: Role[] = [
     white-space: nowrap;
   }
   .role h2 {
-    margin: 0 0 8px;
+    margin: 0 0 14px;
     font-size: 28px;
     font-weight: 800;
     letter-spacing: -0.025em;
@@ -174,25 +174,24 @@ const roles: Role[] = [
   .role__lead {
     margin: 0;
     font-size: 16px;
-    line-height: 1.55;
+    line-height: 1.65;
     color: var(--muted);
   }
 
   .role__features {
     display: grid;
-    gap: 14px;
-    margin: 22px 0 0;
-    padding: 20px 0 0;
-    border-top: 1px solid var(--border);
+    gap: 24px;
+    margin: 32px 0 0;
+    padding: 0;
     list-style: none;
   }
   .role__features li {
     display: grid;
     grid-template-columns: 20px minmax(0, 1fr);
-    gap: 12px;
+    gap: 16px;
     align-items: start;
     font-size: var(--fs-small);
-    line-height: 1.45;
+    line-height: 1.55;
     color: var(--muted);
   }
   .role__features :global(.role__ficon) {
@@ -211,7 +210,7 @@ const roles: Role[] = [
     gap: 8px;
     align-self: flex-start;
     margin-top: auto;
-    padding-top: 26px;
+    padding-top: 36px;
     color: var(--yellow);
     font-size: 18px;
     font-weight: 700;
