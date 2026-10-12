@@ -46,6 +46,47 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       <slot />
     </main>
     <Footer />
+    <script is:inline>
+      // Jemné vyjetí karet a sekcí při scrollování (styly .reveal v global.css).
+      // Inline na konci <body>, ať se obsah schová ještě před prvním vykreslením.
+      (() => {
+        if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const main = document.getElementById('main');
+        if (!main) return;
+        // Položky mřížek a seznamů (karty) a sekce, které žádné takové položky nemají.
+        const items = [...main.querySelectorAll('ul[class] > li, ol[class] > li')].filter((el) => !el.closest('nav'));
+        const blocks = [...main.querySelectorAll('section')].filter(
+          (el) => !items.some((i) => el.contains(i) || i.contains(el)),
+        );
+        const targets = [...items, ...blocks];
+        if (!targets.length) return;
+        targets.forEach((el) => el.classList.add('reveal'));
+        document.documentElement.classList.add('reveal-on');
+        const io = new IntersectionObserver(
+          (entries) => {
+            // Sourozence, kteří se objeví naráz, pouštíme kousek po sobě.
+            const perParent = new Map();
+            for (const e of entries) {
+              if (!e.isIntersecting) continue;
+              const el = e.target;
+              const i = perParent.get(el.parentElement) ?? 0;
+              perParent.set(el.parentElement, i + 1);
+              el.style.setProperty('--reveal-delay', `${Math.min(i, 6) * 60}ms`);
+              el.classList.add('is-in');
+              io.unobserve(el);
+              // Po dojetí třídy uklidíme, ať zase platí vlastní přechody karet (hover).
+              el.addEventListener(
+                'transitionend',
+                () => el.classList.remove('reveal', 'is-in'),
+                { once: true },
+              );
+            }
+          },
+          { rootMargin: '0px 0px -40px 0px' },
+        );
+        targets.forEach((el) => io.observe(el));
+      })();
+    </script>
   </body>
 </html>
 
