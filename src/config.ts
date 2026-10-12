@@ -28,7 +28,7 @@ export const links = {
 
   // Ostatní weby
   discord: 'https://discord.gg/bbvgGMhQza',
-  forum: '#', // TODO: Voluntia Forum
+  forum: 'https://forum.voluntia.cz/',
   beer: '#', // TODO: Pivo za svobodu
   // Stanovy (PDF ze stránky O nás na původním webu). TODO: přenést do IS, než se WordPress vypne.
   statutes: 'https://voluntia.cz/wp-content/uploads/2026/04/2026-02-02-voluntia-stanovy-zmena.pdf',

@@ -16,7 +16,7 @@ interface Role {
   badge: string;
   soon?: boolean;
   lead: string;
-  features: { icon: IconName; title: string; text: string }[];
+  features: { icon: IconName; text: string }[];
   cta: { label: string; href: string };
 }
 
@@ -26,11 +26,11 @@ const roles: Role[] = [
     icon: 'HandHeart',
     title: 'Příznivec',
     badge: '100 Kč/měsíc',
-    lead: 'Pro ty, kdo chtějí být u dění a podporovat stranu, aniž by přebírali formální odpovědnost člena.',
+    lead: 'Podporujete stranu bez formální odpovědnosti člena.',
     features: [
-      { icon: 'Key', title: 'Přístup do strany', text: 'Diskusní kanály, aktivity i konkláve.' },
-      { icon: 'Ear', title: 'Informace', text: 'Pravidelné zprávy o dění ve straně.' },
-      { icon: 'UserPlus', title: 'Cesta ke členství', text: 'Po roce můžete požádat o řádné členství.' },
+      { icon: 'Key', text: 'Přístup do diskusí a akcí' },
+      { icon: 'Ear', text: 'Pravidelné zprávy o dění' },
+      { icon: 'UserPlus', text: 'Po roce cesta ke členství' },
     ],
     cta: { label: 'Stát se příznivcem', href: links.supporter },
   },
@@ -39,11 +39,11 @@ const roles: Role[] = [
     icon: 'HandHelping',
     title: 'Dobrovolník',
     badge: 'Zdarma',
-    lead: 'Pro ty, kdo chtějí přispět svým časem a energií – v terénu i on-line.',
+    lead: 'Pomáháte svým časem – v terénu i on-line.',
     features: [
-      { icon: 'Megaphone', title: 'Kampaně a akce', text: 'Příprava a realizace politických i komunitních aktivit.' },
-      { icon: 'Newspaper', title: 'Materiály', text: 'Samolepky, plakáty a další propagace.' },
-      { icon: 'BicepsFlexed', title: 'Zkušenosti', text: 'Politický marketing, organizace, grassroots.' },
+      { icon: 'Megaphone', text: 'Kampaně a akce' },
+      { icon: 'Newspaper', text: 'Samolepky, plakáty, propagace' },
+      { icon: 'BicepsFlexed', text: 'Zkušenosti z politiky' },
     ],
     cta: { label: 'Stát se dobrovolníkem', href: links.volunteer },
   },
@@ -53,10 +53,10 @@ const roles: Role[] = [
     title: 'Kandidát',
     badge: 'Připravujeme',
     soon: true,
-    lead: 'Pro ty, kdo jsou ochotní jít na kandidátku. Ozveme se vám před volbami, když nám budou chybět kandidáti.',
+    lead: 'Jste ochotní jít na kandidátku? Ozveme se před volbami.',
     features: [
-      { icon: 'Phone', title: 'Kontakt před volbami', text: 'Oslovíme vás při sestavování kandidátek.' },
-      { icon: 'LogIn', title: 'Přístup do IS', text: 'Na kandidátku se můžete zapsat i sami.' },
+      { icon: 'Phone', text: 'Kontakt před volbami' },
+      { icon: 'LogIn', text: 'Zápis na kandidátku v IS' },
     ],
     cta: { label: 'Napsat nám', href: `mailto:${contact.email}` },
   },
@@ -65,11 +65,11 @@ const roles: Role[] = [
     icon: 'HandCoins',
     title: 'Přispěvatel',
     badge: '50–200 Kč/měsíc',
-    lead: 'Pro ty, kdo chtějí pravidelně finančně podpořit dlouhodobý rozvoj Voluntie.',
+    lead: 'Pravidelně financujete dlouhodobý rozvoj Voluntie.',
     features: [
-      { icon: 'Ear', title: 'Přehled o penězích', text: 'Víte, na co byly příspěvky použity.' },
-      { icon: 'Users', title: 'Komunita', text: 'Veřejná role na stranickém Discordu.' },
-      { icon: 'AudioLines', title: 'Diskuse', text: 'O programu i o financovaných projektech.' },
+      { icon: 'Ear', text: 'Přehled, kam peníze šly' },
+      { icon: 'Users', text: 'Role na Discordu' },
+      { icon: 'AudioLines', text: 'Diskuse o programu' },
     ],
     cta: { label: 'Stát se přispěvatelem', href: links.contributor },
   },
@@ -87,7 +87,7 @@ const roles: Role[] = [
         roles.map((r) => (
           <li class:list={['role', { 'role--soon': r.soon }]} id={r.id}>
             <div class="role__head">
-              <Icon name={r.icon} size={32} class="role__icon" />
+              <Icon name={r.icon} size={28} class="role__icon" />
               <span class="role__badge">{r.badge}</span>
             </div>
             <h2>{r.title}</h2>
@@ -95,11 +95,8 @@ const roles: Role[] = [
             <ul class="role__features">
               {r.features.map((f) => (
                 <li>
-                  <Icon name={f.icon} size={20} class="role__ficon" />
-                  <span>
-                    <strong>{f.title}</strong>
-                    {f.text}
-                  </span>
+                  <Icon name={f.icon} size={18} class="role__ficon" />
+                  {f.text}
                 </li>
               ))}
             </ul>
@@ -111,10 +108,18 @@ const roles: Role[] = [
       }
     </ul>
 
-    <p class="community">
-      Chcete se nejdřív rozhlédnout? Přijďte do komunity na <a href={links.discord}>Discordu</a>,
-      nebo si přečtěte náš <a href={links.program}>program</a>.
-    </p>
+    <!-- Komunita: nejnižší práh, jak se zapojit – proto výrazněji než role. -->
+    <section class="community" aria-labelledby="komunita-title">
+      <Icon name="MessagesSquare" size={40} class="community__icon" />
+      <div class="community__text">
+        <h2 id="komunita-title">Nejdřív se rozhlédnout? Přijďte na Discord</h2>
+        <p>Diskuse, akce i domluva dobrovolníků. Přidat se může každý, i bez členství.</p>
+      </div>
+      <div class="community__actions">
+        <a class="btn btn--primary" href={links.discord}>Připojit se na Discord</a>
+        {links.forum !== '#' && <a class="btn btn--ghost" href={links.forum}>Voluntia Forum</a>}
+      </div>
+    </section>
   </div>
 </Base>
 
@@ -185,28 +190,23 @@ const roles: Role[] = [
 
   .role__features {
     display: grid;
-    gap: 14px;
-    margin: 20px 0 0;
+    gap: 10px;
+    margin: 18px 0 0;
     padding: 0;
     list-style: none;
   }
   .role__features li {
     display: grid;
-    grid-template-columns: 20px minmax(0, 1fr);
-    gap: 12px;
+    grid-template-columns: 18px minmax(0, 1fr);
+    gap: 10px;
     align-items: start;
     font-size: var(--fs-small);
-    line-height: 1.45;
-    color: var(--muted);
+    line-height: 1.4;
+    color: var(--text-soft);
   }
   .role__features :global(.role__ficon) {
     margin-top: 1px;
     color: var(--yellow);
-  }
-  .role__features strong {
-    display: block;
-    color: var(--white);
-    font-weight: 700;
   }
 
   .role__cta {
@@ -245,11 +245,6 @@ const roles: Role[] = [
     }
     .role__features {
       align-content: start;
-      gap: 12px;
-      margin-top: 22px;
-    }
-    .role__features li {
-      line-height: 1.4;
     }
     .role__cta {
       padding-top: 20px;
@@ -275,14 +270,39 @@ const roles: Role[] = [
     color: var(--dim);
   }
 
+  /* Discord + fórum: výrazný pás pod rolemi, žlutý rámeček ho odliší od karet. */
   .community {
-    margin: 36px 0 0;
+    display: grid;
+    gap: 16px 24px;
+    align-items: center;
+    margin: 32px 0 0;
+    padding: 24px;
+    border: 2px solid var(--yellow);
+    border-radius: 12px;
+    background: var(--card);
+  }
+  @media (min-width: 48em) {
+    .community {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      padding: 24px 28px;
+    }
+  }
+  .community :global(.community__icon) {
+    color: var(--yellow);
+  }
+  .community h2 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .community p {
+    margin: 0;
     color: var(--muted);
   }
-  .community a {
-    color: var(--white);
-    text-decoration: underline;
-    text-decoration-color: var(--yellow);
-    text-underline-offset: 3px;
+  .community__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 </style>
