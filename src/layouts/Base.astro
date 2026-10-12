@@ -60,7 +60,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         );
         const targets = [...items, ...blocks];
         if (!targets.length) return;
-        targets.forEach((el) => el.classList.add('reveal'));
+        items.forEach((el) => el.classList.add('reveal'));
+        blocks.forEach((el) => el.classList.add('reveal', 'reveal--soft'));
         document.documentElement.classList.add('reveal-on');
         const io = new IntersectionObserver(
           (entries) => {
@@ -77,7 +78,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
               // Po dojetí třídy uklidíme, ať zase platí vlastní přechody karet (hover).
               el.addEventListener(
                 'transitionend',
-                () => el.classList.remove('reveal', 'is-in'),
+                () => el.classList.remove('reveal', 'reveal--soft', 'is-in'),
                 { once: true },
               );
             }

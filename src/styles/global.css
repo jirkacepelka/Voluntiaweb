@@ -602,6 +602,12 @@ a:focus-visible .underline {
   transform: translateY(12px);
 }
 
+/* Celé sekce jen lehce zprůhlední, bez posunu – u velkých bloků by to bylo moc. */
+.reveal-on .reveal--soft {
+  opacity: 0.6;
+  transform: none;
+}
+
 .reveal-on .reveal.is-in {
   opacity: 1;
   transform: none;
