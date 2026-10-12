@@ -328,4 +328,11 @@ const roles: Role[] = [
     flex-wrap: wrap;
     gap: 10px;
   }
+  /* Fórum je vedlejší akce – při najetí jen zesvětlá, nežloutne (žlutá patří Discordu). */
+  .community .btn--ghost:hover,
+  .community .btn--ghost:focus-visible {
+    background: var(--field-hover);
+    border-color: var(--field-hover);
+    color: var(--white);
+  }
 </style>
