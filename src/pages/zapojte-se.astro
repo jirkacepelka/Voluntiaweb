@@ -202,7 +202,8 @@ const roles: Role[] = [
     align-items: start;
     font-size: var(--fs-small);
     line-height: 1.4;
-    color: var(--text-soft);
+    font-weight: 700;
+    color: var(--white);
   }
   .role__features :global(.role__ficon) {
     margin-top: 1px;
@@ -270,14 +271,13 @@ const roles: Role[] = [
     color: var(--dim);
   }
 
-  /* Discord + fórum: výrazný pás pod rolemi, žlutý rámeček ho odliší od karet. */
+  /* Discord + fórum: výrazný pás pod rolemi přes celou šířku. */
   .community {
     display: grid;
     gap: 16px 24px;
     align-items: center;
     margin: 32px 0 0;
     padding: 24px;
-    border: 2px solid var(--yellow);
     border-radius: 12px;
     background: var(--card);
   }
