@@ -5,6 +5,7 @@ import Toc from '../components/Toc.astro';
 import ShareBar from '../components/ShareBar.astro';
 import { cms } from '../lib/cms';
 import { addHeadingIds, removeElements } from '../lib/cms/html';
+import * as icons from 'lucide-static';
 
 const page = await cms.getPage('manifest');
 if (!page) throw new Error('Stránku „manifest“ se nepodařilo načíst z CMS.');
@@ -18,6 +19,33 @@ let content = page.contentHtml.replace(/<h[3-6][^>]*>([\s\S]*?)<\/h[3-6]>/, (h, 
 // Tlačítka „↑ zpět na kapitoly“ z Elementoru – obsah kapitol je vpravo, takže je nepotřebujeme.
 content = removeElements(content, /<div[^>]*class="[^"]*elementor-widget-button\b[^"]*"[^>]*>/i);
 content = content.replace(/<a[^>]*href="#home"[^>]*>[\s\S]*?<\/a>/gi, '');
+// Ikony kapitol z WordPressu (různé sady z SVG Repo) → Lucide jako zbytek webu. Vlastní
+// symboly (socha svobody, had u minimálního státu) zůstávají jako obrázky.
+const chapterIcons: [RegExp, keyof typeof icons][] = [
+  [/earth-earth-responsibility/, 'Earth'],
+  [/cart-icon/, 'ShoppingCart'],
+  [/Handshake-Streamline/, 'Handshake'],
+  [/law-svgrepo/, 'Scale'],
+  [/economy-svgrepo/, 'Coins'],
+  [/heart-hand-svgrepo/, 'HandHeart'],
+  [/school-svgrepo/, 'GraduationCap'],
+  [/shield-svgrepo/, 'Shield'],
+  [/arrows-triangle-svgrepo/, 'Recycle'],
+  [/megaphone-/, 'Megaphone'],
+];
+content = content.replace(/<img\b[^>]*>/g, (img) => {
+  // Logo se sloganem „Dobrovolnost = svoboda“ → logo Libertariánská strana.
+  if (/Logo-wide/.test(img)) {
+    return '<img class="manifest__logo" src="/logo-voluntia-yellow.svg" alt="Voluntia – Libertariánská strana" width="320" height="88">';
+  }
+  const match = chapterIcons.find(([re]) => re.test(img));
+  if (!match) return img;
+  return String(icons[match[1]])
+    .replace(/class="[^"]*"/, 'class="manifest__icon" aria-hidden="true"')
+    .replace(/width="24"/, 'width="56"')
+    .replace(/height="24"/, 'height="56"')
+    .replace(/stroke-width="2"/, 'stroke-width="1.75"');
+});
 const { html, headings } = addHeadingIds(content);
 ---
 
@@ -31,31 +59,44 @@ const { html, headings } = addHeadingIds(content);
   /* Začátek kapitoly: malá ikona vlevo vedle nadpisu a citátu (v obsahu z CMS je ikona
      v samostatném bloku nad nimi). Blok, který přímo obsahuje obrázek i nadpis, dostane
      rozvržení vedle sebe. */
-  .manifest :global(div:has(> div > figure img):has(> div h2)),
-  .manifest :global(div:has(> figure img):has(> div h2)) {
+  .manifest :global(div:has(> div > figure :is(img, svg)):has(> div h2)),
+  .manifest :global(div:has(> figure :is(img, svg)):has(> div h2)) {
     display: flex;
     align-items: flex-start;
     gap: 18px;
     margin: 2.2em 0 1.3em;
   }
-  .manifest :global(div:has(> div > figure img):has(> div h2) figure),
-  .manifest :global(div:has(> figure img):has(> div h2) > figure) {
+  .manifest :global(div:has(> div > figure :is(img, svg)):has(> div h2) figure),
+  .manifest :global(div:has(> figure :is(img, svg)):has(> div h2) > figure) {
     flex: none;
     width: 88px;
     margin: 4px 0 0;
   }
-  .manifest :global(div:has(> div > figure img):has(> div h2) img),
-  .manifest :global(div:has(> figure img):has(> div h2) > figure img) {
+  .manifest :global(div:has(> div > figure :is(img, svg)):has(> div h2) img),
+  .manifest :global(div:has(> figure :is(img, svg)):has(> div h2) > figure img) {
     width: 88px;
     height: 88px;
     object-fit: contain;
     border-radius: 0;
   }
-  .manifest :global(div:has(> div > figure img):has(> div h2) h2),
-  .manifest :global(div:has(> figure img):has(> div h2) h2) {
+  .manifest :global(div:has(> div > figure :is(img, svg)):has(> div h2) h2),
+  .manifest :global(div:has(> figure :is(img, svg)):has(> div h2) h2) {
     margin-top: 0;
   }
-  .manifest :global(div:has(> div > figure img):has(> div h2) p) {
+  /* Ikona Lucide uprostřed stejného místa jako obrázkové symboly, ať text začíná všude stejně. */
+  .manifest :global(.manifest__icon) {
+    display: block;
+    width: 56px;
+    height: 56px;
+    margin: 4px auto 0;
+    color: var(--yellow);
+  }
+  .manifest :global(.manifest__logo) {
+    width: min(320px, 100%);
+    height: auto;
+    border-radius: 0;
+  }
+  .manifest :global(div:has(> div > figure :is(img, svg)):has(> div h2) p) {
     margin-bottom: 0;
   }
 </style>
