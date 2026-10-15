@@ -42,9 +42,9 @@ content = content.replace(/<img\b[^>]*>/g, (img) => {
   if (!match) return img;
   return String(icons[match[1]])
     .replace(/class="[^"]*"/, 'class="manifest__icon" aria-hidden="true"')
-    .replace(/width="24"/, 'width="56"')
-    .replace(/height="24"/, 'height="56"')
-    .replace(/stroke-width="2"/, 'stroke-width="1.75"');
+    .replace(/width="24"/, 'width="88"')
+    .replace(/height="24"/, 'height="88"')
+    .replace(/stroke-width="2"/, 'stroke-width="1.5"');
 });
 const { html, headings } = addHeadingIds(content);
 ---
@@ -83,12 +83,11 @@ const { html, headings } = addHeadingIds(content);
   .manifest :global(div:has(> figure :is(img, svg)):has(> div h2) h2) {
     margin-top: 0;
   }
-  /* Ikona Lucide uprostřed stejného místa jako obrázkové symboly, ať text začíná všude stejně. */
+  /* Ikona Lucide v plné velikosti obrázkových symbolů (had, socha), ať jsou kapitoly vyrovnané. */
   .manifest :global(.manifest__icon) {
     display: block;
-    width: 56px;
-    height: 56px;
-    margin: 4px auto 0;
+    width: 88px;
+    height: 88px;
     color: var(--yellow);
   }
   .manifest :global(.manifest__logo) {
