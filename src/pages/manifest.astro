@@ -21,7 +21,7 @@ content = content.replace(/<a[^>]*href="#home"[^>]*>[\s\S]*?<\/a>/gi, '');
 const { html, headings } = addHeadingIds(content);
 ---
 
-<ContentPage title="Manifest Libertariánské strany Voluntia" metaTitle="Manifest" lede={subtitle} crumbs={[{ label: 'Úvod', href: '/' }, { label: 'Manifest' }]}>
+<ContentPage title="Manifest Libertariánské strany Voluntia" metaTitle="Manifest" asideLabel="Kapitoly" asideSticky lede={subtitle} crumbs={[{ label: 'Úvod', href: '/' }, { label: 'Manifest' }]}>
   <div class="prose manifest" set:html={html} />
   <ShareBar title="Manifest Libertariánské strany Voluntia" label="Sdílet manifest" />
   {headings.length > 1 && <Toc slot="aside" headings={headings} />}

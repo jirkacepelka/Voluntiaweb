@@ -31,7 +31,12 @@ const { headings, title = 'Kapitoly' } = Astro.props;
     [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')].map((a) => [a.dataset.tocLink!, a]),
   );
   const targets = [...links.keys()].map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
-  const setActive = (id: string) => links.forEach((a, key) => a.toggleAttribute('aria-current', key === id));
+  // Aktuální kapitolu ukazuje i rozbalovací nabídka na mobilu (viz ContentPage).
+  const current = document.querySelector('[data-aside-current]');
+  const setActive = (id: string) => {
+    links.forEach((a, key) => a.toggleAttribute('aria-current', key === id));
+    if (current) current.textContent = links.get(id)?.lastChild?.textContent?.trim() ?? '';
+  };
 
   if (targets.length) {
     // Aktivní je poslední kapitola, jejíž nadpis už přejel horní třetinu okna.

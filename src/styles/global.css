@@ -692,15 +692,99 @@ html:has(#nav-toggle:checked) {
   }
 }
 
-.page-aside {
-  padding-top: 40px;
-  border-top: 1px solid var(--border);
+/* Mobil: sloupec je rozbalovací nabídka hned pod nadpisem (article se „rozpustí“, aby se
+   nabídka dala vložit mezi nadpis a text). */
+@media (max-width: 61.99em) {
+  .page-layout {
+    gap: 0;
+  }
+  .page-layout > article {
+    display: contents;
+  }
+  .page-layout > article > header {
+    order: 0;
+  }
+  .page-aside {
+    order: 1;
+    margin-top: 28px;
+  }
+  .page-layout > article > .content {
+    order: 2;
+  }
+  /* Pruh v barvě stránky nad nabídkou, ať pod ní neprosvítá text. */
+  .page-aside--sticky {
+    position: sticky;
+    top: var(--header-h);
+    margin-top: 20px;
+    padding: 8px 0;
+    background: var(--bg);
+    z-index: 20;
+    align-self: start;
+  }
+  .page-aside__toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 0 16px;
+    border-radius: 12px;
+    background: var(--card);
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+  }
+  .page-aside__toggle::-webkit-details-marker {
+    display: none;
+  }
+  .page-aside__current {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--muted);
+    font-weight: 500;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .page-aside__current:empty {
+    display: none;
+  }
+  .page-aside__chevron {
+    flex: none;
+    margin-left: auto;
+    color: var(--muted);
+    transition: transform var(--dur) var(--ease);
+  }
+  .page-aside__inner[open] .page-aside__chevron {
+    transform: rotate(180deg);
+  }
+  .page-aside__body {
+    margin-top: 8px;
+  }
+  /* Přilepená nabídka se otevírá přes text jako panel. */
+  .page-aside--sticky .page-aside__toggle {
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+  }
+  .page-aside--sticky .page-aside__body {
+    position: absolute;
+    left: 0;
+    right: 0;
+    max-height: calc(100dvh - var(--header-h) - 96px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--black);
+    box-shadow: 0 24px 40px rgb(0 0 0 / 0.5);
+  }
+  /* Nadpis sloupce je na mobilu v tlačítku nabídky. */
+  .page-aside__body > :first-child > h2:first-child {
+    display: none;
+  }
 }
 
 @media (min-width: 62em) {
-  .page-aside {
-    padding-top: 0;
-    border-top: 0;
+  .page-aside__toggle {
+    display: none;
   }
   .page-aside__inner {
     position: sticky;

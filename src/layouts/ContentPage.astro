@@ -1,9 +1,11 @@
 ---
 // Rozvržení obsahové stránky: drobečky, titulek, perex, text vlevo a volitelný sloupec vpravo
-// (slot "aside"). Bez sloupce je text v čitelné šířce.
+// (slot "aside"). Bez sloupce je text v čitelné šířce. Na mobilu je sloupec rozbalovací
+// nabídka hned pod nadpisem (`asideLabel`), volitelně přilepená pod lištou (`asideSticky`).
 import Base from './Base.astro';
 import Crumbs from '../components/Crumbs.astro';
 import DonateCta from '../components/DonateCta.astro';
+import Icon from '../components/Icon.astro';
 
 interface Props {
   title: string;
@@ -13,9 +15,13 @@ interface Props {
   lede?: string;
   crumbs?: { label: string; href?: string }[];
   donate?: boolean;
+  /** Popisek rozbalovací nabídky se sloupcem na mobilu. */
+  asideLabel?: string;
+  /** Na mobilu nabídka zůstane při scrollování pod horní lištou (obsah dlouhého dokumentu). */
+  asideSticky?: boolean;
 }
 
-const { title, metaTitle, description, lede, crumbs = [{ label: 'Úvod', href: '/' }, { label: title }], donate = true } = Astro.props;
+const { title, metaTitle, description, lede, crumbs = [{ label: 'Úvod', href: '/' }, { label: title }], donate = true, asideLabel = 'Obsah', asideSticky = false } = Astro.props;
 const hasAside = Astro.slots.has('aside');
 ---
 
@@ -37,10 +43,17 @@ const hasAside = Astro.slots.has('aside');
 
       {
         hasAside && (
-          <aside class="page-aside">
-            <div class="page-aside__inner">
-              <slot name="aside" />
-            </div>
+          <aside class:list={['page-aside', { 'page-aside--sticky': asideSticky }]}>
+            <details class="page-aside__inner" open>
+              <summary class="page-aside__toggle">
+                <span class="page-aside__label">{asideLabel}</span>
+                <span class="page-aside__current" data-aside-current />
+                <Icon name="ChevronDown" size={20} class="page-aside__chevron" />
+              </summary>
+              <div class="page-aside__body">
+                <slot name="aside" />
+              </div>
+            </details>
           </aside>
         )
       }
@@ -49,6 +62,21 @@ const hasAside = Astro.slots.has('aside');
 
   {donate && <DonateCta />}
 </Base>
+
+<script>
+  // Na desktopu je sloupec vždy otevřený, na mobilu je to zavřená nabídka, která se po
+  // kliknutí na odkaz zase zavře. (Bez JS zůstane otevřená všude.)
+  const menu = document.querySelector<HTMLDetailsElement>('.page-aside__inner');
+  if (menu) {
+    const desktop = matchMedia('(min-width: 62em)');
+    const sync = () => (menu.open = desktop.matches);
+    sync();
+    desktop.addEventListener('change', sync);
+    menu.addEventListener('click', (e) => {
+      if (!desktop.matches && (e.target as Element).closest('.page-aside__body a')) menu.open = false;
+    });
+  }
+</script>
 
 <style>
   .page-single {
