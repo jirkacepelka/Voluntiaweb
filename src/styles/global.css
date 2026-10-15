@@ -627,6 +627,16 @@ a:focus-visible .underline {
   animation-duration: 220ms;
 }
 
+/* Nižší lišta na mobilu; s otevřeným menu se stránka pod ním neposouvá. */
+@media (max-width: 61.99em) {
+  :root {
+    --header-h: 64px;
+  }
+}
+html:has(#nav-toggle:checked) {
+  overflow: hidden;
+}
+
 /* Horní lišta zůstává při přechodu na místě. */
 .p-header {
   view-transition-name: site-header;

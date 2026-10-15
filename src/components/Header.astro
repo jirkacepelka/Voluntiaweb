@@ -1,7 +1,8 @@
 ---
 // Horní lišta podle IS (.p-header: černá, 80 px) se strukturou z návrhu ve Frameru:
 // hlavní položky, rozbalovací menu „Více“ na celou šířku a tlačítko Přispět.
-// Mobil: hamburger bez JS (zaškrtávátko), skupiny z „Více“ jsou v něm rovnou rozbalené.
+// Mobil: nižší lišta s Přispět vedle hamburgeru (bez JS, zaškrtávátko); menu přes celou
+// obrazovku, skupiny z „Více“ jsou v něm rovnou rozbalené.
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
 import { links, nav, navMore } from '../config';
@@ -12,8 +13,9 @@ const isCurrent = (href: string) => href.startsWith('/') && !href.includes('#') 
 
 <header class="p-header">
   <div class="container p-header__inner">
-    <a href="/" aria-label="Voluntia – úvodní stránka"><Logo height={50} /></a>
+    <a class="p-header__logo" href="/" aria-label="Voluntia – úvodní stránka"><Logo height={50} /></a>
 
+    <a class="btn btn--light p-header__cta" href={links.donate}>Přispět</a>
     <input type="checkbox" id="nav-toggle" class="nav-toggle" />
     <label for="nav-toggle" class="nav-toggle-label">
       <span class="sr-only">Menu</span>
@@ -83,6 +85,12 @@ const isCurrent = (href: string) => href.startsWith('/') && !href.includes('#') 
     }
     if (toggle?.checked) toggle.checked = false;
   });
+  // Odkaz v mobilním menu (i kotva na téže stránce) menu zavře.
+  document.querySelectorAll('.p-nav a').forEach((a) =>
+    a.addEventListener('click', () => {
+      if (toggle) toggle.checked = false;
+    }),
+  );
   document.addEventListener('click', (e) => {
     if (header && !header.contains(e.target as Node)) setMore(false);
   });
@@ -104,6 +112,15 @@ const isCurrent = (href: string) => href.startsWith('/') && !href.includes('#') 
   }
 
   /* ── Mobil ─────────────────────────────────────────────── */
+  .p-header__logo :global(.logo) {
+    height: 40px;
+  }
+  .p-header__cta {
+    height: 38px;
+    margin-left: auto;
+    padding: 0 16px;
+    font-size: 15px;
+  }
   .nav-toggle {
     display: none;
   }
@@ -113,7 +130,7 @@ const isCurrent = (href: string) => href.startsWith('/') && !href.includes('#') 
     justify-content: center;
     width: 44px;
     height: 44px;
-    margin-right: -10px;
+    margin: 0 -10px 0 -8px;
     color: var(--white);
     cursor: pointer;
   }
@@ -127,17 +144,26 @@ const isCurrent = (href: string) => href.startsWith('/') && !href.includes('#') 
   .p-nav {
     display: none;
   }
+  /* Otevřené menu zabere celou obrazovku pod lištou a scrolluje samo (stránka pod ním stojí). */
   .nav-toggle:checked ~ .p-nav {
     display: block;
-    position: absolute;
+    position: fixed;
     left: 0;
     right: 0;
-    top: 100%;
-    max-height: calc(100vh - var(--header-h));
+    top: var(--header-h);
+    bottom: 0;
     overflow-y: auto;
+    overscroll-behavior: contain;
     background: var(--black);
     border-top: 1px solid var(--border);
-    padding: 12px 0 0;
+    padding: 8px 0 calc(32px + env(safe-area-inset-bottom));
+    animation: nav-in 220ms var(--ease);
+  }
+  @keyframes nav-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
   }
   ul {
     list-style: none;
@@ -147,7 +173,6 @@ const isCurrent = (href: string) => href.startsWith('/') && !href.includes('#') 
   .p-nav__main {
     display: flex;
     flex-direction: column;
-    gap: 4px;
     padding: 0 var(--gutter);
   }
   .p-nav a:not(.btn) {
@@ -156,58 +181,60 @@ const isCurrent = (href: string) => href.startsWith('/') && !href.includes('#') 
     font-weight: 500;
     transition: color var(--dur) var(--ease);
   }
+  .p-nav__main li:not(.p-nav__cta) {
+    border-bottom: 1px solid var(--border);
+  }
   .p-nav__main a:not(.btn) {
     display: block;
-    padding: 10px 0;
+    padding: 14px 0;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
   }
   .p-nav a:not(.btn):hover,
   .p-nav a:not(.btn)[aria-current] {
     color: var(--yellow);
     text-decoration: none;
   }
-  .p-nav__more-item {
+  /* Přispět je na mobilu přímo v liště. */
+  .p-nav__more-item,
+  .p-nav__cta {
     display: none;
   }
-  .p-nav__cta {
-    order: 10;
-    margin-top: 14px;
-  }
-  .p-nav__cta .btn {
-    width: 100%;
-  }
 
-  /* Skupiny z „Více“ – na mobilu rovnou vidět pod hlavními položkami. */
-  .mega {
-    margin-top: 12px;
-    border-top: 1px solid var(--border);
-  }
+  /* Skupiny z „Více“ – na mobilu rovnou vidět, menší a ve dvou sloupcích. */
   .mega__cols {
     display: grid;
-    gap: 24px;
-    padding-top: 20px;
-    padding-bottom: 24px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 20px;
+    padding-top: 28px;
   }
   .mega__group h2 {
     margin: 0 0 8px;
-    font-size: var(--fs-body);
+    font-size: 12px;
     font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
   }
   .mega__group ul {
     display: flex;
     flex-direction: column;
-    gap: 2px;
   }
   .mega__group a:not(.btn) {
     display: block;
-    padding: 5px 0;
-    font-size: var(--fs-small);
+    padding: 6px 0;
     color: var(--text-soft);
   }
 
   /* ── Desktop ───────────────────────────────────────────── */
   @media (min-width: 62em) {
-    .nav-toggle-label {
+    .nav-toggle-label,
+    .p-header__cta {
       display: none;
+    }
+    .p-header__logo :global(.logo) {
+      height: 50px;
     }
     .p-nav,
     .nav-toggle:checked ~ .p-nav {
@@ -218,6 +245,7 @@ const isCurrent = (href: string) => href.startsWith('/') && !href.includes('#') 
       border: 0;
       padding: 0;
       background: none;
+      animation: none;
     }
     .p-nav__main {
       flex-direction: row;
@@ -225,10 +253,17 @@ const isCurrent = (href: string) => href.startsWith('/') && !href.includes('#') 
       gap: 22px;
       padding: 0;
     }
+    .p-nav__main li:not(.p-nav__cta) {
+      border: 0;
+    }
     .p-nav__main a:not(.btn) {
       padding: 0;
+      font-size: var(--fs-nav);
+      font-weight: 500;
+      letter-spacing: normal;
     }
-    .p-nav__more-item {
+    .p-nav__more-item,
+    .p-nav__cta {
       display: block;
     }
     .p-nav__more {
@@ -257,13 +292,6 @@ const isCurrent = (href: string) => href.startsWith('/') && !href.includes('#') 
     .p-nav__more[aria-expanded='true'] :global(.p-nav__chevron) {
       transform: rotate(180deg);
     }
-    .p-nav__cta {
-      order: 0;
-      margin-top: 0;
-    }
-    .p-nav__cta .btn {
-      width: auto;
-    }
 
     /* Menu „Více“ přes celou šířku pod lištou – plynule se prolne, neskočí.
        `visibility` ho po zavření skryje i pro klávesnici a čtečky. */
@@ -289,6 +317,16 @@ const isCurrent = (href: string) => href.startsWith('/') && !href.includes('#') 
       visibility: visible;
       transform: none;
       transition-delay: 0s;
+    }
+    .mega__group h2 {
+      font-size: var(--fs-body);
+      letter-spacing: normal;
+      text-transform: none;
+      color: var(--white);
+    }
+    .mega__group a:not(.btn) {
+      padding: 5px 0;
+      font-size: var(--fs-small);
     }
     .mega__cols {
       grid-template-columns: repeat(3, minmax(0, 1fr));
